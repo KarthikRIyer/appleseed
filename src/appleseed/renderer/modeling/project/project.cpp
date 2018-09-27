@@ -32,6 +32,9 @@
 
 // appleseed.renderer headers.
 #include "renderer/global/globallogger.h"
+#ifdef APPLESEED_WITH_OPTIX
+#include "renderer/kernel/intersection/optixtracecontext.h"
+#endif
 #include "renderer/kernel/intersection/tracecontext.h"
 #include "renderer/kernel/lighting/lightpathrecorder.h"
 #include "renderer/modeling/display/display.h"
@@ -86,15 +89,19 @@ UniqueID Project::get_class_uid()
 
 struct Project::Impl
 {
-    size_t                      m_format_revision;
-    string                      m_path;
-    auto_release_ptr<Scene>     m_scene;
-    auto_release_ptr<Frame>     m_frame;
-    auto_release_ptr<Display>   m_display;
-    LightPathRecorder           m_light_path_recorder;
-    ConfigurationContainer      m_configurations;
-    SearchPaths                 m_search_paths;
-    unique_ptr<TraceContext>    m_trace_context;
+    size_t                          m_format_revision;
+    string                          m_path;
+    auto_release_ptr<Scene>         m_scene;
+    auto_release_ptr<Frame>         m_frame;
+    auto_release_ptr<Display>       m_display;
+    LightPathRecorder               m_light_path_recorder;
+    ConfigurationContainer          m_configurations;
+    SearchPaths                     m_search_paths;
+    unique_ptr<TraceContext>        m_trace_context;
+
+#ifdef APPLESEED_WITH_OPTIX
+    unique_ptr<OptixTraceContext>   m_optix_trace_context;
+#endif
 
     Impl()
       : m_format_revision(ProjectFormatRevision)
@@ -296,13 +303,30 @@ void Project::update_trace_context()
 }
 
 #ifdef APPLESEED_WITH_EMBREE
-
 void Project::set_use_embree(const bool value)
 {
     if (impl->m_trace_context.get() != nullptr)
         impl->m_trace_context->set_use_embree(value);
 }
+#endif
 
+#ifdef APPLESEED_WITH_OPTIX
+const OptixTraceContext& Project::get_optix_trace_context(OptixContext* context) const
+{
+    if (impl->m_optix_trace_context.get() == nullptr)
+    {
+        assert(impl->m_scene.get());
+        impl->m_optix_trace_context.reset(new OptixTraceContext(*impl->m_scene, context));
+    }
+
+    return *impl->m_optix_trace_context;
+}
+
+void Project::update_optix_trace_context()
+{
+    if (impl->m_optix_trace_context.get())
+        impl->m_optix_trace_context->update();
+}
 #endif
 
 void Project::add_base_configurations()

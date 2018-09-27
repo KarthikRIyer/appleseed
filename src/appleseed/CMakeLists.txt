@@ -1032,6 +1032,12 @@ if (WITH_EMBREE)
         renderer/kernel/intersection/embreescene.h
     )
 endif ()
+if (WITH_OPTIX)
+    list (APPEND renderer_kernel_intersection_sources
+        renderer/kernel/intersection/optixtracecontext.cpp
+        renderer/kernel/intersection/optixtracecontext.h
+    )
+endif()
 list (APPEND appleseed_sources
     ${renderer_kernel_intersection_sources}
 )
