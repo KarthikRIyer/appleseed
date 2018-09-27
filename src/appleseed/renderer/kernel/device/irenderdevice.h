@@ -5,7 +5,7 @@
 //
 // This software is released under the MIT license.
 //
-// Copyright (c) 2015-2018 Francois Beaune, The appleseedhq Organization
+// Copyright (c) 2018 Esteban Tovagliari, The appleseedhq Organization
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,39 +26,44 @@
 // THE SOFTWARE.
 //
 
-#ifndef APPLESEED_RENDERER_UTILITY_SETTINGSPARSING_H
-#define APPLESEED_RENDERER_UTILITY_SETTINGSPARSING_H
+#ifndef APPLESEED_RENDERER_KERNEL_DEVICE_IRENDERDEVICE_H
+#define APPLESEED_RENDERER_KERNEL_DEVICE_IRENDERDEVICE_H
 
 // appleseed.renderer headers.
-#include "renderer/global/globaltypes.h"
+#include "renderer/kernel/rendering/irenderercontroller.h"
 
-// appleseed.main headers.
-#include "main/dllsymbol.h"
-
-// Standard headers.
-#include <cstddef>
-#include <string>
+// appleseed.foundation headers.
+#include "foundation/core/concepts/noncopyable.h"
 
 // Forward declarations.
-namespace renderer  { class ParamArray; }
+namespace foundation { class IAbortSwitch; }
+namespace renderer   { class TextureStore; }
+namespace renderer   { class ITileCallbackFactory; }
 
 namespace renderer
 {
 
-// Render device.
-APPLESEED_DLLSYMBOL const char* get_render_device(const ParamArray& params);
+class IRenderDevice
+  : public foundation::NonCopyable
+{
+  public:
+    virtual ~IRenderDevice()
+    {
+    }
 
-// Spectrum mode.
-APPLESEED_DLLSYMBOL Spectrum::Mode get_spectrum_mode(const ParamArray& params);
-std::string get_spectrum_mode_name(const Spectrum::Mode mode);
+    virtual bool initialize(
+        TextureStore&               texture_store,
+        foundation::IAbortSwitch&   abort_switch)  = 0;
 
-// Sampling mode.
-APPLESEED_DLLSYMBOL SamplingContext::Mode get_sampling_context_mode(const ParamArray& params);
-std::string get_sampling_context_mode_name(const SamplingContext::Mode mode);
+    // Build or update ray tracing acceleration structures.
+    virtual void build_or_update_bvh() = 0;
 
-// Rendering threads.
-APPLESEED_DLLSYMBOL size_t get_rendering_thread_count(const ParamArray& params);
+    virtual IRendererController::Status render_frame(
+        ITileCallbackFactory*       tile_callback_factory,
+        TextureStore&               texture_store,
+        foundation::IAbortSwitch&   abort_switch) = 0;
+};
 
 }       // namespace renderer
 
-#endif  // !APPLESEED_RENDERER_UTILITY_SETTINGSPARSING_H
+#endif  // !APPLESEED_RENDERER_KERNEL_DEVICE_IRENDERDEVICE_H

@@ -5,7 +5,7 @@
 //
 // This software is released under the MIT license.
 //
-// Copyright (c) 2015-2018 Francois Beaune, The appleseedhq Organization
+// Copyright (c) 2018 Esteban Tovagliari, The appleseedhq Organization
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,39 +26,51 @@
 // THE SOFTWARE.
 //
 
-#ifndef APPLESEED_RENDERER_UTILITY_SETTINGSPARSING_H
-#define APPLESEED_RENDERER_UTILITY_SETTINGSPARSING_H
+// Interface header.
+#include "gpurenderdevice.h"
 
 // appleseed.renderer headers.
-#include "renderer/global/globaltypes.h"
+#include "renderer/kernel/rendering/iframerenderer.h"
+#include "renderer/modeling/project/project.h"
 
-// appleseed.main headers.
-#include "main/dllsymbol.h"
-
-// Standard headers.
-#include <cstddef>
-#include <string>
-
-// Forward declarations.
-namespace renderer  { class ParamArray; }
+using namespace foundation;
 
 namespace renderer
 {
 
-// Render device.
-APPLESEED_DLLSYMBOL const char* get_render_device(const ParamArray& params);
+GPURenderDevice::GPURenderDevice(
+    Project&                project,
+    const ParamArray&       params,
+    const char*             ptx_dir,
+    IRendererController*    renderer_controller)
+  : RenderDeviceBase(project, params, renderer_controller)
+  , m_optix_context(ptx_dir)
+{
+}
 
-// Spectrum mode.
-APPLESEED_DLLSYMBOL Spectrum::Mode get_spectrum_mode(const ParamArray& params);
-std::string get_spectrum_mode_name(const Spectrum::Mode mode);
+GPURenderDevice::~GPURenderDevice()
+{
+}
 
-// Sampling mode.
-APPLESEED_DLLSYMBOL SamplingContext::Mode get_sampling_context_mode(const ParamArray& params);
-std::string get_sampling_context_mode_name(const SamplingContext::Mode mode);
+bool GPURenderDevice::initialize(
+    TextureStore&           texture_store,
+    IAbortSwitch&           abort_switch)
+{
+    return true;
+}
 
-// Rendering threads.
-APPLESEED_DLLSYMBOL size_t get_rendering_thread_count(const ParamArray& params);
+void GPURenderDevice::build_or_update_bvh()
+{
+    m_project.get_optix_trace_context(&m_optix_context);
+    m_project.update_optix_trace_context();
+}
 
-}       // namespace renderer
+IRendererController::Status GPURenderDevice::render_frame(
+    ITileCallbackFactory*   tile_callback_factory,
+    TextureStore&           texture_store,
+    IAbortSwitch&           abort_switch)
+{
+    return IRendererController::AbortRendering;
+}
 
-#endif  // !APPLESEED_RENDERER_UTILITY_SETTINGSPARSING_H
+}

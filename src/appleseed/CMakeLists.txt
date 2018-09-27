@@ -999,6 +999,26 @@ source_group ("renderer\\kernel\\denoising" FILES
     ${renderer_kernel_denoising_sources}
 )
 
+set (renderer_kernel_device_sources
+    renderer/kernel/device/irenderdevice.h
+    renderer/kernel/device/cpurenderdevice.cpp
+    renderer/kernel/device/cpurenderdevice.h
+    renderer/kernel/device/renderdevicebase.cpp
+    renderer/kernel/device/renderdevicebase.h
+)
+if (WITH_OPTIX)
+    list (APPEND renderer_kernel_device_sources
+        renderer/kernel/device/gpurenderdevice.cpp
+        renderer/kernel/device/gpurenderdevice.h
+    )
+endif()
+list (APPEND appleseed_sources
+    ${renderer_kernel_device_sources}
+)
+source_group ("renderer\\kernel\\device" FILES
+    ${renderer_kernel_device_sources}
+)
+
 set (renderer_kernel_intersection_sources
     renderer/kernel/intersection/assemblytree.cpp
     renderer/kernel/intersection/assemblytree.h

@@ -5,7 +5,7 @@
 //
 // This software is released under the MIT license.
 //
-// Copyright (c) 2015-2018 Francois Beaune, The appleseedhq Organization
+// Copyright (c) 2018 Esteban Tovagliari, The appleseedhq Organization
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,39 +26,57 @@
 // THE SOFTWARE.
 //
 
-#ifndef APPLESEED_RENDERER_UTILITY_SETTINGSPARSING_H
-#define APPLESEED_RENDERER_UTILITY_SETTINGSPARSING_H
+// Interface header.
+#include "cpurenderdevice.h"
 
 // appleseed.renderer headers.
-#include "renderer/global/globaltypes.h"
-
-// appleseed.main headers.
-#include "main/dllsymbol.h"
+#include "renderer/modeling/project/project.h"
+#include "renderer/modeling/scene/scene.h"
 
 // Standard headers.
-#include <cstddef>
 #include <string>
 
-// Forward declarations.
-namespace renderer  { class ParamArray; }
+using namespace foundation;
+using namespace std;
 
 namespace renderer
 {
 
-// Render device.
-APPLESEED_DLLSYMBOL const char* get_render_device(const ParamArray& params);
+CPURenderDevice::CPURenderDevice(
+    Project&                project,
+    const ParamArray&       params,
+    IRendererController*    renderer_controller)
+  : RenderDeviceBase(project, params, renderer_controller)
+{
+}
 
-// Spectrum mode.
-APPLESEED_DLLSYMBOL Spectrum::Mode get_spectrum_mode(const ParamArray& params);
-std::string get_spectrum_mode_name(const Spectrum::Mode mode);
+CPURenderDevice::~CPURenderDevice()
+{
+}
 
-// Sampling mode.
-APPLESEED_DLLSYMBOL SamplingContext::Mode get_sampling_context_mode(const ParamArray& params);
-std::string get_sampling_context_mode_name(const SamplingContext::Mode mode);
+bool CPURenderDevice::initialize(
+    TextureStore&           texture_store,
+    IAbortSwitch&           abort_switch)
+{
+    return false;
+}
 
-// Rendering threads.
-APPLESEED_DLLSYMBOL size_t get_rendering_thread_count(const ParamArray& params);
+void CPURenderDevice::build_or_update_bvh()
+{
+#ifdef APPLESEED_WITH_EMBREE
+    m_project.set_use_embree(
+        m_params.get_optional<bool>("use_embree", false));
+#endif
 
-}       // namespace renderer
+    m_project.update_trace_context();
+}
 
-#endif  // !APPLESEED_RENDERER_UTILITY_SETTINGSPARSING_H
+IRendererController::Status CPURenderDevice::render_frame(
+    ITileCallbackFactory*   tile_callback_factory,
+    TextureStore&           texture_store,
+    IAbortSwitch&           abort_switch)
+{
+    return IRendererController::AbortRendering;
+}
+
+}
