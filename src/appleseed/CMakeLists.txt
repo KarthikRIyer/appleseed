@@ -58,6 +58,7 @@ source_group ("foundation\\core\\concepts" FILES
 
 set (foundation_core_exceptions_sources
     foundation/core/exceptions/exception.h
+    foundation/core/exceptions/exceptioncudaerror.h
     foundation/core/exceptions/exceptionioerror.h
     foundation/core/exceptions/exceptionnotimplemented.h
     foundation/core/exceptions/exceptionunsupportedfileformat.h
@@ -1219,6 +1220,19 @@ list (APPEND appleseed_sources
 source_group ("renderer\\kernel\\rendering\\generic" FILES
     ${renderer_kernel_rendering_generic_sources}
 )
+
+if (WITH_OPTIX)
+    set (renderer_kernel_rendering_gpu_sources
+        renderer/kernel/rendering/gpu/ptxcache.cpp
+        renderer/kernel/rendering/gpu/ptxcache.h
+    )
+    list (APPEND appleseed_sources
+        ${renderer_kernel_rendering_gpu_sources}
+    )
+    source_group ("renderer\\kernel\\rendering\\gpu" FILES
+        ${renderer_kernel_rendering_gpu_sources}
+    )
+endif()
 
 set (renderer_kernel_rendering_progressive_sources
     renderer/kernel/rendering/progressive/progressiveframerenderer.cpp
