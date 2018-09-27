@@ -95,6 +95,11 @@
 
 #endif
 
+#ifdef APPLESEED_WITH_OPTIX
+    #include <cuda.h>
+    #include <optix.h>
+#endif
+
 using namespace std;
 
 namespace foundation
@@ -885,6 +890,95 @@ uint64 System::get_peak_process_virtual_memory_size()
 
 #endif
 
+#ifdef APPLESEED_WITH_OPTIX
+namespace
+{
+
+void print_gpu_information(Logger& logger)
+{
+    //CUdevice dev;
+    CUresult error = cuInit(0);
+
+    if (error != CUDA_SUCCESS)
+    {
+        const char* error_string;
+
+        if (cuGetErrorString(error, &error_string) == CUDA_SUCCESS)
+        {
+            logger.write(
+                LogMessage::Info,
+                __FILE__,
+                __LINE__,
+                "CUDA initialization failed. Error: %s.\n",
+                error_string);
+        }
+        else
+        {
+            logger.write(
+                LogMessage::Info,
+                __FILE__,
+                __LINE__,
+                "CUDA initialization failed. Unknown error: %d.\n",
+                error);
+        }
+        return;
+    }
+
+    int device_count;
+    cuDeviceGetCount(&device_count);
+
+    if (device_count == 0)
+    {
+        logger.write(LogMessage::Info, __FILE__, __LINE__, "No GPU devices found.\n");
+        return;
+    }
+
+    logger.write(LogMessage::Info, __FILE__, __LINE__, "GPU information:");
+
+    int driver_version = 0;
+    cuDriverGetVersion(&driver_version);
+
+    logger.write(LogMessage::Info, __FILE__, __LINE__, "  Driver version         %d", driver_version);
+    logger.write(LogMessage::Info, __FILE__, __LINE__, "  Device count           %d", device_count);
+
+    for (CUdevice dev = 0; dev < device_count; ++dev)
+    {
+        char device_name[256];
+        cuDeviceGetName(device_name, 256, dev);
+
+        int major = 0, minor = 0;
+        cuDeviceComputeCapability(&major, &minor, dev);
+
+        size_t total_global_mem;
+        cuDeviceTotalMem(&total_global_mem, dev);
+
+        logger.write(
+            LogMessage::Info,
+            __FILE__,
+            __LINE__,
+            "    Device %s:\n"
+            "      Compute capability        %d.%d\n"
+            "      Memory                    %.0f MBytes",
+            device_name,
+            major,
+            minor,
+            total_global_mem / 1048576.0f);
+    }
+
+    unsigned int optix_version;
+
+    if (rtGetVersion(&optix_version) == RT_SUCCESS)
+    {
+        unsigned int major =  optix_version / 10000;
+        unsigned int minor = (optix_version % 10000) / 100;
+        unsigned int micro =  optix_version % 100;
+        logger.write(LogMessage::Info, __FILE__, __LINE__, "  using OptiX version %d.%d.%d", major, minor, micro);
+    }
+}
+
+}
+#endif
+
 // ------------------------------------------------------------------------------------------------
 // Common code.
 // ------------------------------------------------------------------------------------------------
@@ -952,6 +1046,10 @@ void System::print_information(Logger& logger)
         pretty_size(get_total_virtual_memory_size()).c_str(),
         pretty_uint(DefaultWallclockTimer().frequency()).c_str(),
         pretty_uint(DefaultProcessorTimer().frequency()).c_str());
+
+#ifdef APPLESEED_WITH_OPTIX
+    print_gpu_information(logger);
+#endif
 }
 
 const char* System::get_cpu_architecture()
