@@ -1223,6 +1223,8 @@ source_group ("renderer\\kernel\\rendering\\generic" FILES
 
 if (WITH_OPTIX)
     set (renderer_kernel_rendering_gpu_sources
+        renderer/kernel/rendering/gpu/optixcontext.cpp
+        renderer/kernel/rendering/gpu/optixcontext.h
         renderer/kernel/rendering/gpu/ptxcache.cpp
         renderer/kernel/rendering/gpu/ptxcache.h
     )
