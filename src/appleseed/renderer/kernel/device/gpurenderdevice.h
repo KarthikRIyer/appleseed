@@ -31,7 +31,7 @@
 
 // appleseed.renderer headers.
 #include "renderer/kernel/device/renderdevicebase.h"
-#include "renderer/kernel/rendering/gpu/optixcontext.h"
+#include "renderer/kernel/gpu/optixcontext.h"
 
 // Forward declarations.
 namespace foundation { class IAbortSwitch; }

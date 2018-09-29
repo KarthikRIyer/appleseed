@@ -31,7 +31,7 @@
 
 // appleseed.renderer headers.
 #include "renderer/global/globallogger.h"
-#include "renderer/kernel/rendering/gpu/optixcontext.h"
+#include "renderer/kernel/gpu/optixcontext.h"
 #include "renderer/modeling/light/light.h"
 #include "renderer/modeling/material/material.h"
 #include "renderer/modeling/object/meshobject.h"

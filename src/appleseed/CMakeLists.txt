@@ -1019,6 +1019,21 @@ source_group ("renderer\\kernel\\device" FILES
     ${renderer_kernel_device_sources}
 )
 
+if (WITH_OPTIX)
+    set (renderer_kernel_gpu_sources
+        renderer/kernel/gpu/optixcontext.cpp
+        renderer/kernel/gpu/optixcontext.h
+        renderer/kernel/gpu/ptxcache.cpp
+        renderer/kernel/gpu/ptxcache.h
+    )
+    list (APPEND appleseed_sources
+        ${renderer_kernel_gpu_sources}
+    )
+    source_group ("renderer\\kernel\\gpu" FILES
+        ${renderer_kernel_gpu_sources}
+    )
+endif()
+
 set (renderer_kernel_intersection_sources
     renderer/kernel/intersection/assemblytree.cpp
     renderer/kernel/intersection/assemblytree.h
@@ -1246,21 +1261,6 @@ list (APPEND appleseed_sources
 source_group ("renderer\\kernel\\rendering\\generic" FILES
     ${renderer_kernel_rendering_generic_sources}
 )
-
-if (WITH_OPTIX)
-    set (renderer_kernel_rendering_gpu_sources
-        renderer/kernel/rendering/gpu/optixcontext.cpp
-        renderer/kernel/rendering/gpu/optixcontext.h
-        renderer/kernel/rendering/gpu/ptxcache.cpp
-        renderer/kernel/rendering/gpu/ptxcache.h
-    )
-    list (APPEND appleseed_sources
-        ${renderer_kernel_rendering_gpu_sources}
-    )
-    source_group ("renderer\\kernel\\rendering\\gpu" FILES
-        ${renderer_kernel_rendering_gpu_sources}
-    )
-endif()
 
 set (renderer_kernel_rendering_progressive_sources
     renderer/kernel/rendering/progressive/progressiveframerenderer.cpp

@@ -31,7 +31,7 @@
 
 // appleseed.renderer headers.
 #include "renderer/global/globallogger.h"
-#include "renderer/kernel/rendering/gpu/ptxcache.h"
+#include "renderer/kernel/gpu/ptxcache.h"
 
 namespace renderer
 {
