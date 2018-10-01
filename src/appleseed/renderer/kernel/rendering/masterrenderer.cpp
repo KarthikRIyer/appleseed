@@ -32,6 +32,10 @@
 
 // appleseed.renderer headers.
 #include "renderer/global/globallogger.h"
+#include "renderer/kernel/device/cpurenderdevice.h"
+#ifdef APPLESEED_WITH_OPTIX
+#include "renderer/kernel/device/gpurenderdevice.h"
+#endif
 #include "renderer/kernel/lighting/lightpathrecorder.h"
 #include "renderer/kernel/rendering/iframerenderer.h"
 #include "renderer/kernel/rendering/itilecallback.h"
@@ -133,6 +137,7 @@ struct MasterRenderer::Impl
     ITileCallbackFactory*       m_serial_tile_callback_factory;
 
     Display*                    m_display;
+    unique_ptr<IRenderDevice>   m_device;
 
     Impl(
         Project&          project,
@@ -295,13 +300,45 @@ struct MasterRenderer::Impl
     // Render the project.
     MasterRenderer::RenderingResult render()
     {
+        RenderingResult result;
+
+        // Update the render device if needed.
+        const char* device_name = get_render_device(m_params);
+
+        if (strcmp(device_name, "cpu") == 0)
+        {
+            if (dynamic_cast<const CPURenderDevice*>(m_device.get()) == nullptr)
+                m_device.reset(new CPURenderDevice(m_project, m_params, m_renderer_controller));
+        }
+#ifdef APPLESEED_WITH_OPTIX
+        else if (strcmp(device_name, "gpu") == 0)
+        {
+            if (dynamic_cast<const GPURenderDevice*>(m_device.get()) == nullptr)
+            {
+                m_device.reset(
+                    new GPURenderDevice(
+                        m_project,
+                        m_params,
+                        "/hdd/Devel/appleseedhq/appleseedX/sandbox/ptx", // todo: do not hardcode this...
+                        m_renderer_controller));
+            }
+        }
+#endif
+        else
+        {
+            RENDERER_LOG_ERROR("Unknown render device %s", device_name);
+
+            m_device.reset();
+
+            result.m_status = RenderingResult::Aborted;
+            return result;
+        }
+
         // Initialize thread-local variables.
         Spectrum::set_mode(get_spectrum_mode(m_params));
 
         // Reset the frame's render info.
         m_project.get_frame()->render_info().clear();
-
-        RenderingResult result;
 
         try
         {
