@@ -75,6 +75,12 @@ inline ExceptionCUDAError::ExceptionCUDAError(CUresult error)
     set_what(err.c_str());
 }
 
+inline void check_cuda_error(const CUresult error)
+{
+    if (error != CUDA_SUCCESS)
+        throw ExceptionCUDAError(error);
+}
+
 }       // namespace foundation
 
 #endif  // !APPLESEED_FOUNDATION_CORE_EXCEPTIONS_EXCEPTIONCUDAERROR_H
