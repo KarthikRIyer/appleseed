@@ -1330,6 +1330,12 @@ set (renderer_kernel_rendering_sources
     renderer/kernel/rendering/timedrenderercontroller.cpp
     renderer/kernel/rendering/timedrenderercontroller.h
 )
+if (WITH_OPTIX)
+    list (APPEND renderer_kernel_rendering_sources
+        renderer/kernel/rendering/optixrendererservices.cpp
+        renderer/kernel/rendering/optixrendererservices.h
+    )
+endif()
 list (APPEND appleseed_sources
     ${renderer_kernel_rendering_sources}
 )
