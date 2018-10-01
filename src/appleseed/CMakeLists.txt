@@ -1022,6 +1022,8 @@ source_group ("renderer\\kernel\\device" FILES
 
 if (WITH_OPTIX)
     set (renderer_kernel_gpu_sources
+        renderer/kernel/gpu/cudadevice.cpp
+        renderer/kernel/gpu/cudadevice.h
         renderer/kernel/gpu/optixcontext.cpp
         renderer/kernel/gpu/optixcontext.h
         renderer/kernel/gpu/ptxcache.cpp
