@@ -48,15 +48,36 @@ struct OptixContext::Impl
     optix::Group        m_scene;
     optix::Acceleration m_scene_accel;
 
-    explicit Impl(const char* ptx_dir)
+    explicit Impl(const int device_number, const char* ptx_dir)
       : m_ptx_cache(ptx_dir)
     {
         m_context = optix::Context::create();
 
+        // Pick a device.
+        if (device_number >= 0)
+        {
+            for (unsigned int i = 0, e = m_context->getDeviceCount(); i < e; ++i)
+            {
+                int cuda_device_ordinal;
+                m_context->getDeviceAttribute(
+                    static_cast<int>(i),
+                    RT_DEVICE_ATTRIBUTE_CUDA_DEVICE_ORDINAL,
+                    sizeof(int),
+                    &cuda_device_ordinal);
+
+                if (cuda_device_ordinal == device_number)
+                {
+                    m_context->setDevices(&i, &i + 1);
+                    break;
+                }
+            }
+        }
+
         m_context->setEntryPointCount(1);
         m_context->setStackSize(400);
 
-        init_ray_types();
+        // Init ray types.
+        m_context->setRayTypeCount(1);
 
         // Create the scene root.
         m_scene = m_context->createGroup();
@@ -84,11 +105,6 @@ struct OptixContext::Impl
         m_context->destroy();
     }
 
-    void init_ray_types()
-    {
-        m_context->setRayTypeCount(1);
-    }
-
     static void usage_report_callback(int /* verbosity */, const char* tag, const char* message, void* /* user_data */)
     {
         RENDERER_LOG_DEBUG("%s: %s", tag, message);
@@ -96,7 +112,12 @@ struct OptixContext::Impl
 };
 
 OptixContext::OptixContext(const char* ptx_dir)
-  : impl(new Impl(ptx_dir))
+  : impl(new Impl(-1, ptx_dir))
+{
+}
+
+OptixContext::OptixContext(const int device_number, const char* ptx_dir)
+  : impl(new Impl(device_number, ptx_dir))
 {
 }
 

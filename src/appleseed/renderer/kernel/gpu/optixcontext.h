@@ -49,6 +49,9 @@ class OptixContext
     // Constructor.
     explicit OptixContext(const char* ptx_dir);
 
+    // Constructor.
+    OptixContext(const int device_number, const char* ptx_dir);
+
     // Destructor.
     ~OptixContext();
 
