@@ -97,13 +97,13 @@ class Ray
     VectorType point_at(const ValueType t) const;
 };
 
-#ifdef APPLESEED_DEVICE_COMPILATION
-
 template <>
 class APPLESEED_DEVICE_ALIGN(16) Ray<float, 3>
 {
   public:
     // Types.
+    typedef float ValueType;
+    typedef Vector3f VectorType;
     typedef Ray<float, 3> RayType;
 
     // Dimension.
@@ -116,9 +116,13 @@ class APPLESEED_DEVICE_ALIGN(16) Ray<float, 3>
     float     m_tmax;                     // end of the ray interval (exclusive)
 
     // Constructors.
+#if !defined(_MSC_VER) || _MSC_VER >= 1800
     Ray() = default;                        // leave all fields uninitialized
+#else
+    Ray() {}                                // leave all fields uninitialized
+#endif
 
-    APPLESEED_DEVICE_INLINE
+    APPLESEED_HOST_DEVICE_INLINE
     Ray(
         const Vector3f& org,
         const Vector3f& dir,
@@ -127,23 +131,21 @@ class APPLESEED_DEVICE_ALIGN(16) Ray<float, 3>
 
     // Construct a ray from another ray of a different type.
     template <typename U>
-    APPLESEED_DEVICE_INLINE
+    APPLESEED_HOST_DEVICE_INLINE
     Ray(const Ray<U, 3>& rhs);
 
     // Return true if the ray has finite length.
-    APPLESEED_DEVICE_INLINE
+    APPLESEED_HOST_DEVICE_INLINE
     bool is_finite() const;
 
     // Get length of the ray interval, assuming that m_tmax is finite.
-    APPLESEED_DEVICE_INLINE
+    APPLESEED_HOST_DEVICE_INLINE
     float get_length() const;
 
     // Return the point of the ray at abscissa t, t >= 0.
-    APPLESEED_DEVICE_INLINE
+    APPLESEED_HOST_DEVICE_INLINE
     Vector3f point_at(const float t) const;
 };
-
-#endif
 
 
 // Poisoning.
@@ -355,9 +357,7 @@ inline bool feq(const Ray<T, N>& lhs, const Ray<T, N>& rhs, const T eps)
         && feq(lhs.m_tmax, rhs.m_tmax, eps);
 }
 
-#ifdef APPLESEED_DEVICE_COMPILATION
-
-APPLESEED_DEVICE_INLINE Ray<float, 3>::Ray(
+APPLESEED_HOST_DEVICE_INLINE Ray<float, 3>::Ray(
     const Vector3f&   org,
     const Vector3f&   dir,
     const float       tmin,
@@ -370,7 +370,7 @@ APPLESEED_DEVICE_INLINE Ray<float, 3>::Ray(
 }
 
 template <typename U>
-APPLESEED_DEVICE_INLINE
+APPLESEED_HOST_DEVICE_INLINE
 Ray<float, 3>::Ray(const Ray<U, 3>& rhs)
   : m_org(rhs.m_org)
   , m_tmin(static_cast<float>(rhs.m_tmin))
@@ -379,26 +379,25 @@ Ray<float, 3>::Ray(const Ray<U, 3>& rhs)
 {
 }
 
-APPLESEED_DEVICE_INLINE
+APPLESEED_HOST_DEVICE_INLINE
 bool Ray<float, 3>::is_finite() const
 {
     return m_tmax < std::numeric_limits<float>::max();
 }
 
-APPLESEED_DEVICE_INLINE
+APPLESEED_HOST_DEVICE_INLINE
 float Ray<float, 3>::get_length() const
 {
     assert(is_finite());
     return (m_tmax - m_tmin) * foundation::norm(m_dir);
 }
 
-APPLESEED_DEVICE_INLINE
+APPLESEED_HOST_DEVICE_INLINE
 Vector3f Ray<float, 3>::point_at(const float t) const
 {
     return m_org + t * m_dir;
 }
 
-#endif
 
 //
 // RayInfo class implementation.
