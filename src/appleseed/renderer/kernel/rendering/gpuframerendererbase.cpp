@@ -32,8 +32,16 @@
 namespace renderer
 {
 
-GPUFrameRendererBase::GPUFrameRendererBase()
+GPUFrameRendererBase::GPUFrameRendererBase(
+    const Project&          project,
+    IRendererController*    renderer_controller,
+    ITileCallbackFactory*   callback_factory)
+  : m_project(project)
+  , m_renderer_controller(renderer_controller)
 {
+    // Create one tile callback.
+    if (callback_factory)
+        m_tile_callback.reset(callback_factory->create());
 }
 
 }   // namespace renderer

@@ -61,7 +61,8 @@ namespace
             IRendererController*            renderer_controller,
             ITileCallbackFactory*           callback_factory,
             const ParamArray&               params)
-          : m_params(params)
+          : GPUFrameRendererBase(project, renderer_controller, callback_factory)
+          , m_params(params)
         {
         }
 

@@ -137,7 +137,7 @@ struct MasterRenderer::Impl
     ITileCallbackFactory*       m_serial_tile_callback_factory;
 
     Display*                    m_display;
-    unique_ptr<IRenderDevice>   m_device;
+    unique_ptr<IRenderDevice>   m_render_device;
 
     Impl(
         Project&          project,
@@ -307,15 +307,15 @@ struct MasterRenderer::Impl
 
         if (strcmp(device_name, "cpu") == 0)
         {
-            if (dynamic_cast<const CPURenderDevice*>(m_device.get()) == nullptr)
-                m_device.reset(new CPURenderDevice(m_project, m_params, m_renderer_controller));
+            if (dynamic_cast<const CPURenderDevice*>(m_render_device.get()) == nullptr)
+                m_render_device.reset(new CPURenderDevice(m_project, m_params, m_renderer_controller));
         }
 #ifdef APPLESEED_WITH_GPU
         else if (strcmp(device_name, "gpu") == 0)
         {
-            if (dynamic_cast<const GPURenderDevice*>(m_device.get()) == nullptr)
+            if (dynamic_cast<const GPURenderDevice*>(m_render_device.get()) == nullptr)
             {
-                m_device.reset(
+                m_render_device.reset(
                     new GPURenderDevice(
                         m_project,
                         m_params,
@@ -328,7 +328,7 @@ struct MasterRenderer::Impl
         {
             RENDERER_LOG_ERROR("Unknown render device %s", device_name);
 
-            m_device.reset();
+            m_render_device.reset();
 
             result.m_status = RenderingResult::Aborted;
             return result;
@@ -470,6 +470,12 @@ struct MasterRenderer::Impl
             *m_project.get_scene(),
             m_params.child("texture_store"));
 
+        // Initialize the render device.
+        /*
+        if (!m_render_device->initialize(texture_store, abort_switch))
+            return IRendererController::AbortRendering;
+        */
+
         // Initialize OSL's shading system.
         if (!initialize_osl_shading_system(texture_store, abort_switch))
             return IRendererController::AbortRendering;
@@ -490,6 +496,8 @@ struct MasterRenderer::Impl
             return IRendererController::AbortRendering;
 
         // Build or update ray tracing acceleration structures.
+        // m_render_device->build_or_update_bvh();
+
 #ifdef APPLESEED_WITH_EMBREE
         m_project.set_use_embree(
             m_params.get_optional<bool>("use_embree", false));
@@ -501,6 +509,7 @@ struct MasterRenderer::Impl
         components.print_settings();
 
         // Execute the main rendering loop.
+        //const auto status = m_device->render_frame(m_tile_callback_factory, texture_store, abort_switch);
         const auto status = render_frame(components, abort_switch);
 
         const CanvasProperties& props = m_project.get_frame()->image().properties();

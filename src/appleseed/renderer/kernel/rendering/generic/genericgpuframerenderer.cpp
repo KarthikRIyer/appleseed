@@ -75,15 +75,11 @@ namespace
             IRendererController*            renderer_controller,
             ITileCallbackFactory*           callback_factory,
             const ParamArray&               params)
-          : m_params(params)
-          , m_project(project)
-          , m_renderer_controller(renderer_controller)
+          : GPUFrameRendererBase(project, renderer_controller, callback_factory)
+          , m_params(params)
           , m_is_rendering(false)
           , m_abort(false)
         {
-            // Create one tile callback.
-            if (callback_factory)
-                m_tile_callback.reset(callback_factory->create());
         }
 
         void release() override
@@ -279,10 +275,6 @@ namespace
         //
 
         const Parameters                m_params;
-
-        const Project&                  m_project;
-        IRendererController*            m_renderer_controller;
-        auto_release_ptr<ITileCallback> m_tile_callback;
 
         std::thread                     m_render_thread;
         bool                            m_is_rendering;

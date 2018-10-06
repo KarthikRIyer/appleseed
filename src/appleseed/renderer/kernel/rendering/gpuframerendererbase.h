@@ -31,6 +31,14 @@
 
 // appleseed.renderer headers.
 #include "renderer/kernel/rendering/iframerenderer.h"
+#include "renderer/kernel/rendering/itilecallback.h"
+
+// appleseed.foundation headers.
+#include "foundation/utility/autoreleaseptr.h"
+
+// Forward declarations.
+namespace renderer  { class IRendererController; }
+namespace renderer  { class Project; }
 
 namespace renderer
 {
@@ -39,7 +47,15 @@ class GPUFrameRendererBase
   : public IFrameRenderer
 {
   protected:
-    GPUFrameRendererBase();
+    GPUFrameRendererBase(
+        const Project&          project,
+        IRendererController*    renderer_controller,
+        ITileCallbackFactory*   callback_factory);
+
+    const Project&                              m_project;
+    IRendererController*                        m_renderer_controller;
+    foundation::auto_release_ptr<ITileCallback> m_tile_callback;
+
 };
 
 }       // namespace renderer
