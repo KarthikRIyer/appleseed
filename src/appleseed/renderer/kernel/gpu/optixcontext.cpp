@@ -73,10 +73,9 @@ struct OptixContext::Impl
             }
         }
 
+        // Init context vars.
         m_context->setEntryPointCount(1);
         m_context->setStackSize(400);
-
-        // Init ray types.
         m_context->setRayTypeCount(1);
 
         // Create the scene root.
@@ -93,8 +92,8 @@ struct OptixContext::Impl
 
         m_context->setExceptionEnabled(RT_EXCEPTION_ALL, true);
     #else
-        //m_context->setUsageReportCallback(&Impl::usage_report_callback, 1, nullptr);
-        //m_context->setExceptionEnabled(RT_EXCEPTION_ALL, false);
+        m_context->setUsageReportCallback(&Impl::usage_report_callback, 1, nullptr);
+        m_context->setExceptionEnabled(RT_EXCEPTION_ALL, false);
     #endif
     }
 
@@ -116,8 +115,8 @@ OptixContext::OptixContext(const char* ptx_dir)
 {
 }
 
-OptixContext::OptixContext(const int device_number, const char* ptx_dir)
-  : impl(new Impl(device_number, ptx_dir))
+OptixContext::OptixContext(const size_t device_number, const char* ptx_dir)
+  : impl(new Impl(static_cast<int>(device_number), ptx_dir))
 {
 }
 
