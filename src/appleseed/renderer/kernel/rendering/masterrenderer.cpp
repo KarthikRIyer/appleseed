@@ -33,7 +33,7 @@
 // appleseed.renderer headers.
 #include "renderer/global/globallogger.h"
 #include "renderer/kernel/device/cpurenderdevice.h"
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
 #include "renderer/kernel/device/gpurenderdevice.h"
 #endif
 #include "renderer/kernel/lighting/lightpathrecorder.h"
@@ -310,7 +310,7 @@ struct MasterRenderer::Impl
             if (dynamic_cast<const CPURenderDevice*>(m_device.get()) == nullptr)
                 m_device.reset(new CPURenderDevice(m_project, m_params, m_renderer_controller));
         }
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
         else if (strcmp(device_name, "gpu") == 0)
         {
             if (dynamic_cast<const GPURenderDevice*>(m_device.get()) == nullptr)

@@ -109,7 +109,7 @@ Dictionary Configuration::get_metadata()
 {
     Dictionary metadata;
 
-#if APPLESEED_WITH_OPTIX
+#if APPLESEED_WITH_GPU
     metadata.insert(
         "device",
         Dictionary()

@@ -67,7 +67,7 @@
 #include "foundation/platform/_endoslheaders.h"
 
 // OptiX headers.
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
 #include <optix.h>
 #endif
 
@@ -107,7 +107,7 @@ LibraryVersionArray ThirdParties::get_versions()
     versions.push_back(APIStringPair("Embree", RTC_VERSION_STRING));
 #endif
 
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
     unsigned int optix_version;
     if (rtGetVersion(&optix_version) == RT_SUCCESS)
     {

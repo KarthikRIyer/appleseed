@@ -95,7 +95,7 @@
 
 #endif
 
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
     #include <cuda.h>
     #include <optix.h>
 #endif
@@ -890,7 +890,7 @@ uint64 System::get_peak_process_virtual_memory_size()
 
 #endif
 
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
 namespace
 {
 
@@ -1047,7 +1047,7 @@ void System::print_information(Logger& logger)
         pretty_uint(DefaultWallclockTimer().frequency()).c_str(),
         pretty_uint(DefaultProcessorTimer().frequency()).c_str());
 
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
     print_gpu_information(logger);
 #endif
 }

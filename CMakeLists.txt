@@ -105,7 +105,7 @@ option (WITH_PYTHON2_BINDINGS               "Build Python bindings for Python 2"
 option (WITH_PYTHON3_BINDINGS               "Build Python bindings for Python 3"                    OFF)
 option (WITH_DISNEY_MATERIAL                "Build Disney material"                                 OFF)
 option (WITH_EMBREE                         "Include support for Embree intersection backend"       OFF)
-option (WITH_OPTIX                          "Build OptiX support"                                   OFF)
+option (WITH_GPU                            "Build GPU support"                                     OFF)
 option (WITH_HEADERS                        "Install header files (to build samples)"               ON)
 option (WITH_SAMPLES                        "Install sample files (requires headers)"               ON)
 option (WITH_TESTS                          "Install unit tests and benchmarks"                     ON)
@@ -284,11 +284,11 @@ endif ()
 # OptiX.
 #--------------------------------------------------------------------------------------------------
 
-if (WITH_OPTIX)
+if (WITH_GPU)
     find_package (CUDA 9.0 REQUIRED)
     find_package (OptiX REQUIRED)
 
-    add_definitions (-DAPPLESEED_WITH_OPTIX)
+    add_definitions (-DAPPLESEED_WITH_GPU)
 endif ()
 
 

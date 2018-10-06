@@ -32,7 +32,7 @@
 # Include directories.
 #--------------------------------------------------------------------------------------------------
 
-if (WITH_OPTIX)
+if (WITH_GPU)
     include_directories(
         ${CUDA_INCLUDE_DIRS}
         ${OPTIX_INCLUDE_DIR}
@@ -1007,7 +1007,7 @@ set (renderer_kernel_device_sources
     renderer/kernel/device/renderdevicebase.cpp
     renderer/kernel/device/renderdevicebase.h
 )
-if (WITH_OPTIX)
+if (WITH_GPU)
     list (APPEND renderer_kernel_device_sources
         renderer/kernel/device/gpurenderdevice.cpp
         renderer/kernel/device/gpurenderdevice.h
@@ -1020,7 +1020,7 @@ source_group ("renderer\\kernel\\device" FILES
     ${renderer_kernel_device_sources}
 )
 
-if (WITH_OPTIX)
+if (WITH_GPU)
     set (renderer_kernel_gpu_sources
         renderer/kernel/gpu/cudadevice.cpp
         renderer/kernel/gpu/cudadevice.h
@@ -1090,7 +1090,7 @@ if (WITH_EMBREE)
         renderer/kernel/intersection/embreescene.h
     )
 endif ()
-if (WITH_OPTIX)
+if (WITH_GPU)
     list (APPEND renderer_kernel_intersection_sources
         renderer/kernel/intersection/optixtracecontext.cpp
         renderer/kernel/intersection/optixtracecontext.h
@@ -1139,7 +1139,7 @@ set (renderer_kernel_lighting_pt_sources
     renderer/kernel/lighting/pt/ptlightingengine.cpp
     renderer/kernel/lighting/pt/ptlightingengine.h
 )
-if (WITH_OPTIX)
+if (WITH_GPU)
     list (APPEND renderer_kernel_lighting_pt_sources
         renderer/kernel/lighting/pt/gpuptlightingengine.cpp
         renderer/kernel/lighting/pt/gpuptlightingengine.h
@@ -1207,7 +1207,7 @@ set (renderer_kernel_lighting_sources
     renderer/kernel/lighting/volumelightingintegrator.cpp
     renderer/kernel/lighting/volumelightingintegrator.h
 )
-if (WITH_OPTIX)
+if (WITH_GPU)
     list (APPEND renderer_kernel_lighting_sources
         renderer/kernel/lighting/igpulightingengine.h
     )
@@ -1289,7 +1289,7 @@ set (renderer_kernel_rendering_generic_sources
     renderer/kernel/rendering/generic/tilejobfactory.cpp
     renderer/kernel/rendering/generic/tilejobfactory.h
 )
-if (WITH_OPTIX)
+if (WITH_GPU)
     list (APPEND renderer_kernel_rendering_generic_sources
         renderer/kernel/rendering/generic/genericgpuframerenderer.cpp
         renderer/kernel/rendering/generic/genericgpuframerenderer.h
@@ -1311,7 +1311,7 @@ set (renderer_kernel_rendering_progressive_sources
     renderer/kernel/rendering/progressive/samplegeneratorjob.cpp
     renderer/kernel/rendering/progressive/samplegeneratorjob.h
 )
-if (WITH_OPTIX)
+if (WITH_GPU)
     list (APPEND renderer_kernel_rendering_progressive_sources
         renderer/kernel/rendering/progressive/progressivegpuframerenderer.cpp
         renderer/kernel/rendering/progressive/progressivegpuframerenderer.h
@@ -1373,7 +1373,7 @@ set (renderer_kernel_rendering_sources
     renderer/kernel/rendering/timedrenderercontroller.cpp
     renderer/kernel/rendering/timedrenderercontroller.h
 )
-if (WITH_OPTIX)
+if (WITH_GPU)
     list (APPEND renderer_kernel_rendering_sources
         renderer/kernel/rendering/gpuframerendererbase.cpp
         renderer/kernel/rendering/gpuframerendererbase.h
@@ -2182,7 +2182,7 @@ set_source_files_properties (${appleseed_schema_files} PROPERTIES
 # CUDA compilation.
 #--------------------------------------------------------------------------------------------------
 
-if (WITH_OPTIX)
+if (WITH_GPU)
     # Build lists of absolute paths to cuda header files.
     foreach (cuda_header ${appleseed_cuda_headers})
         list (APPEND abs_cuda_headers_sources ${PROJECT_SOURCE_DIR}/src/appleseed/${cuda_header})
@@ -2265,7 +2265,7 @@ if (WITH_DISNEY_MATERIAL)
     link_against_seexpr (appleseed)
 endif ()
 
-if (WITH_OPTIX)
+if (WITH_GPU)
     target_link_libraries (appleseed
         ${OPTIX_LIBRARIES}
         ${CUDA_CUDA_LIBRARY}
@@ -2346,6 +2346,6 @@ else ()
     )
 endif ()
 
-if (WITH_OPTIX)
+if (WITH_GPU)
     install (FILES ${appleseed_ptx_files} DESTINATION kernels)
 endif ()

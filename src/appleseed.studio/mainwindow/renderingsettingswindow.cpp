@@ -425,7 +425,7 @@ namespace
             QFormLayout* layout = create_form_layout();
             container()->setLayout(layout);
 
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
             QComboBox* device_combobox = create_combobox("device");
             device_combobox->setToolTip(m_params_metadata.get_path("device.help"));
             device_combobox->addItem("CPU", "cpu");

@@ -32,7 +32,7 @@
 
 // appleseed.renderer headers.
 #include "renderer/global/globallogger.h"
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
 #include "renderer/kernel/intersection/optixtracecontext.h"
 #endif
 #include "renderer/kernel/intersection/tracecontext.h"
@@ -99,7 +99,7 @@ struct Project::Impl
     SearchPaths                     m_search_paths;
     unique_ptr<TraceContext>        m_trace_context;
 
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
     unique_ptr<OptixTraceContext>   m_optix_trace_context;
 #endif
 
@@ -310,7 +310,7 @@ void Project::set_use_embree(const bool value)
 }
 #endif
 
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
 const OptixTraceContext& Project::get_optix_trace_context(OptixContext* context) const
 {
     if (impl->m_optix_trace_context.get() == nullptr)

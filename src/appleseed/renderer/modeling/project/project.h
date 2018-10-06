@@ -95,7 +95,7 @@ namespace renderer      { class LightPathRecorder; }
 namespace renderer      { class Material; }
 namespace renderer      { class Object; }
 namespace renderer      { class OnFrameBeginRecorder; }
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
 namespace renderer      { class OptixContext; }
 namespace renderer      { class OptixTraceContext; }
 #endif
@@ -204,7 +204,7 @@ class APPLESEED_DLLSYMBOL Project
     void set_use_embree(const bool value);
 #endif
 
-#ifdef APPLESEED_WITH_OPTIX
+#ifdef APPLESEED_WITH_GPU
     // Get the OptiX trace context.
     const OptixTraceContext& get_optix_trace_context(OptixContext* context) const;
 
