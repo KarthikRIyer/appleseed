@@ -1035,6 +1035,26 @@ if (WITH_OPTIX)
     source_group ("renderer\\kernel\\gpu" FILES
         ${renderer_kernel_gpu_sources}
     )
+
+    set (renderer_kernel_gpu_kernels_headers
+    )
+    set (renderer_kernel_gpu_kernels_sources
+        renderer/kernel/gpu/kernels/exception.cu
+        renderer/kernel/gpu/kernels/hit.cu
+        renderer/kernel/gpu/kernels/intersect.cu
+        renderer/kernel/gpu/kernels/meshobject.cu
+        renderer/kernel/gpu/kernels/miss.cu
+    )
+    list (APPEND appleseed_cuda_headers
+        ${renderer_kernel_gpu_kernels_headers}
+    )
+    list (APPEND appleseed_cuda_sources
+        ${renderer_kernel_gpu_kernels_sources}
+    )
+    source_group ("renderer\\kernel\\gpu\\kernels" FILES
+        ${renderer_kernel_gpu_kernels_headers}
+        ${renderer_kernel_gpu_kernels_sources}
+    )
 endif()
 
 set (renderer_kernel_intersection_sources
@@ -2159,11 +2179,49 @@ set_source_files_properties (${appleseed_schema_files} PROPERTIES
 
 
 #--------------------------------------------------------------------------------------------------
+# CUDA compilation.
+#--------------------------------------------------------------------------------------------------
+
+if (WITH_OPTIX)
+    # Build lists of absolute paths to cuda header files.
+    foreach (cuda_header ${appleseed_cuda_headers})
+        list (APPEND abs_cuda_headers_sources ${PROJECT_SOURCE_DIR}/src/appleseed/${cuda_header})
+    endforeach ()
+
+    # Compile PTX into the sandbox.
+    foreach (cuda_source ${appleseed_cuda_sources})
+        # Build the .ptx destination file name.
+        get_filename_component (cuda_source_we ${cuda_source} NAME_WE)
+        set (ptx_filename ${cuda_source_we}.ptx)
+
+        # Build the sandbox destination directory.
+        set (ptx_dir "${PROJECT_SOURCE_DIR}/sandbox/kernels")
+
+        add_custom_command (
+            OUTPUT ${ptx_dir}/${ptx_filename}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${ptx_dir}
+            COMMAND ${CUDA_NVCC_EXECUTABLE}
+                "-I${CUDA_INCLUDE_DIR} "
+                "-I${OPTIX_INCLUDE_DIR} "
+                "-I${PROJECT_SOURCE_DIR}/src/appleseed "
+                -m64 -arch sm_35 -ptx --std=c++11 -O3 --use_fast_math --expt-relaxed-constexpr
+                ${PROJECT_SOURCE_DIR}/src/appleseed/${cuda_source} -o ${ptx_dir}/${ptx_filename}
+            MAIN_DEPENDENCY ${PROJECT_SOURCE_DIR}/src/appleseed/${cuda_source}
+            DEPENDS ${abs_cuda_headers_sources}
+        )
+
+        list (APPEND appleseed_ptx_files ${ptx_dir}/${ptx_filename})
+    endforeach ()
+endif ()
+
+
+#--------------------------------------------------------------------------------------------------
 # Target.
 #--------------------------------------------------------------------------------------------------
 
 add_library (appleseed SHARED
     ${appleseed_sources}
+    ${appleseed_ptx_files}
 )
 
 if (USE_VISIBILITY_MAP)
@@ -2286,4 +2344,8 @@ else ()
     install (TARGETS appleseed
         DESTINATION lib
     )
+endif ()
+
+if (WITH_OPTIX)
+    install (FILES ${appleseed_ptx_files} DESTINATION kernels)
 endif ()
