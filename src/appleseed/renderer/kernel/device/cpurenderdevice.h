@@ -64,6 +64,8 @@ class CPURenderDevice
         ITileCallbackFactory*       tile_callback_factory,
         TextureStore&               texture_store,
         foundation::IAbortSwitch&   abort_switch) override;
+
+    void print_settings() const override;
 };
 
 }       // namespace renderer

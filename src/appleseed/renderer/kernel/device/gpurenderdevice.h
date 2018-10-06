@@ -70,6 +70,8 @@ class GPURenderDevice
         TextureStore&               texture_store,
         foundation::IAbortSwitch&   abort_switch) override;
 
+    void print_settings() const override;
+
   private:
     CUDADeviceList&                 m_device_list;
     const char*                     m_ptx_dir;

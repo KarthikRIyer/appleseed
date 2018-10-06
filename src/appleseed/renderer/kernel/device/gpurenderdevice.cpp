@@ -96,4 +96,9 @@ IRendererController::Status GPURenderDevice::render_frame(
     return IRendererController::AbortRendering;
 }
 
+void GPURenderDevice::print_settings() const
+{
+    // todo: implement me...
+}
+
 }

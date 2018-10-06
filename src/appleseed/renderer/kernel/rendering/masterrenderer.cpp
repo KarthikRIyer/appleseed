@@ -470,11 +470,9 @@ struct MasterRenderer::Impl
             *m_project.get_scene(),
             m_params.child("texture_store"));
 
-        // Initialize the render device.
-        /*
-        if (!m_render_device->initialize(texture_store, abort_switch))
-            return IRendererController::AbortRendering;
-        */
+// Initialize the render device.
+if (!m_render_device->initialize(texture_store, abort_switch))
+    return IRendererController::AbortRendering;
 
         // Initialize OSL's shading system.
         if (!initialize_osl_shading_system(texture_store, abort_switch))
@@ -495,8 +493,8 @@ struct MasterRenderer::Impl
         if (!components.create())
             return IRendererController::AbortRendering;
 
-        // Build or update ray tracing acceleration structures.
-        // m_render_device->build_or_update_bvh();
+// Build or update ray tracing acceleration structures.
+m_render_device->build_or_update_bvh();
 
 #ifdef APPLESEED_WITH_EMBREE
         m_project.set_use_embree(
@@ -508,9 +506,11 @@ struct MasterRenderer::Impl
         // Print renderer component settings.
         components.print_settings();
 
+m_render_device->print_settings();
+
         // Execute the main rendering loop.
-        //const auto status = m_device->render_frame(m_tile_callback_factory, texture_store, abort_switch);
-        const auto status = render_frame(components, abort_switch);
+auto status = m_render_device->render_frame(m_tile_callback_factory, texture_store, abort_switch);
+        /*const auto */ status = render_frame(components, abort_switch);
 
         const CanvasProperties& props = m_project.get_frame()->image().properties();
         m_project.get_light_path_recorder().finalize(

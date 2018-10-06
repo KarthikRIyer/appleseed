@@ -62,6 +62,8 @@ class IRenderDevice
         ITileCallbackFactory*       tile_callback_factory,
         TextureStore&               texture_store,
         foundation::IAbortSwitch&   abort_switch) = 0;
+
+    virtual void print_settings() const = 0;
 };
 
 }       // namespace renderer

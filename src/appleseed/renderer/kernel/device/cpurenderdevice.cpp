@@ -58,7 +58,8 @@ bool CPURenderDevice::initialize(
     TextureStore&           texture_store,
     IAbortSwitch&           abort_switch)
 {
-    return false;
+    // todo: implement me...
+    return true;
 }
 
 void CPURenderDevice::build_or_update_bvh()
@@ -77,6 +78,11 @@ IRendererController::Status CPURenderDevice::render_frame(
     IAbortSwitch&           abort_switch)
 {
     return IRendererController::AbortRendering;
+}
+
+void CPURenderDevice::print_settings() const
+{
+    // todo: implement me...
 }
 
 }
