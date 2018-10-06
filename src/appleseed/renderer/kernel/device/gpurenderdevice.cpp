@@ -30,7 +30,6 @@
 #include "gpurenderdevice.h"
 
 // appleseed.renderer headers.
-#include "renderer/kernel/gpu/optixcontext.h"
 #include "renderer/kernel/rendering/iframerenderer.h"
 #include "renderer/modeling/project/project.h"
 
@@ -70,10 +69,7 @@ GPURenderDevice::GPURenderDevice(
 
     // todo: pick the best device here.
     CUDADevice& device = m_device_list.get_device(0);
-
-    device.create_context();
-    m_optix_context.reset(
-        new OptixContext(static_cast<size_t>(device.device_number()), ptx_dir));
+    m_cuda_device_number = device.device_number();
 }
 
 GPURenderDevice::~GPURenderDevice()
@@ -89,8 +85,7 @@ bool GPURenderDevice::initialize(
 
 void GPURenderDevice::build_or_update_bvh()
 {
-    m_project.get_optix_trace_context(m_optix_context.get());
-    m_project.update_optix_trace_context();
+    m_project.update_optix_trace_context(m_cuda_device_number, m_ptx_dir);
 }
 
 IRendererController::Status GPURenderDevice::render_frame(

@@ -48,28 +48,30 @@ struct OptixContext::Impl
     optix::Group        m_scene;
     optix::Acceleration m_scene_accel;
 
+    const int           m_device_number;
+
     explicit Impl(const int device_number, const char* ptx_dir)
       : m_ptx_cache(ptx_dir)
+      , m_device_number(device_number)
     {
         m_context = optix::Context::create();
 
         // Pick a device.
-        if (device_number >= 0)
-        {
-            for (unsigned int i = 0, e = m_context->getDeviceCount(); i < e; ++i)
-            {
-                int cuda_device_ordinal;
-                m_context->getDeviceAttribute(
-                    static_cast<int>(i),
-                    RT_DEVICE_ATTRIBUTE_CUDA_DEVICE_ORDINAL,
-                    sizeof(int),
-                    &cuda_device_ordinal);
+        assert(device_number >= 0);
 
-                if (cuda_device_ordinal == device_number)
-                {
-                    m_context->setDevices(&i, &i + 1);
-                    break;
-                }
+        for (unsigned int i = 0, e = m_context->getDeviceCount(); i < e; ++i)
+        {
+            int cuda_device_ordinal;
+            m_context->getDeviceAttribute(
+                static_cast<int>(i),
+                RT_DEVICE_ATTRIBUTE_CUDA_DEVICE_ORDINAL,
+                sizeof(int),
+                &cuda_device_ordinal);
+
+            if (cuda_device_ordinal == device_number)
+            {
+                m_context->setDevices(&i, &i + 1);
+                break;
             }
         }
 
@@ -110,19 +112,19 @@ struct OptixContext::Impl
     }
 };
 
-OptixContext::OptixContext(const char* ptx_dir)
-  : impl(new Impl(-1, ptx_dir))
-{
-}
-
-OptixContext::OptixContext(const size_t device_number, const char* ptx_dir)
-  : impl(new Impl(static_cast<int>(device_number), ptx_dir))
+OptixContext::OptixContext(const int device_number, const char* ptx_dir)
+  : impl(new Impl(device_number, ptx_dir))
 {
 }
 
 OptixContext::~OptixContext()
 {
     delete impl;
+}
+
+int OptixContext::get_device_number() const
+{
+    return impl->m_device_number;
 }
 
 optix::Group OptixContext::get_scene()

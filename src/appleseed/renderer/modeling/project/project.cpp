@@ -311,21 +311,33 @@ void Project::set_use_embree(const bool value)
 #endif
 
 #ifdef APPLESEED_WITH_GPU
-const OptixTraceContext& Project::get_optix_trace_context(OptixContext* context) const
+const OptixTraceContext& Project::get_optix_trace_context() const
 {
-    if (impl->m_optix_trace_context.get() == nullptr)
-    {
-        assert(impl->m_scene.get());
-        impl->m_optix_trace_context.reset(new OptixTraceContext(*impl->m_scene, context));
-    }
-
+    assert(impl->m_optix_trace_context);
     return *impl->m_optix_trace_context;
 }
 
-void Project::update_optix_trace_context()
+void Project::update_optix_trace_context(const int device_number, const char* ptx_dir)
 {
-    if (impl->m_optix_trace_context.get())
-        impl->m_optix_trace_context->update();
+    assert(impl->m_scene.get());
+
+    // Check if the GPU render device has changed.
+    if (impl->m_optix_trace_context)
+    {
+        const int current_device_number =
+            impl->m_optix_trace_context->get_optix_context().get_device_number();
+
+        if (current_device_number != device_number)
+            impl->m_optix_trace_context.reset();
+    }
+
+    if (!impl->m_optix_trace_context)
+    {
+        impl->m_optix_trace_context.reset(
+            new OptixTraceContext(*impl->m_scene, device_number, ptx_dir));
+    }
+
+    impl->m_optix_trace_context->update();
 }
 #endif
 

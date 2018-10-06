@@ -646,10 +646,13 @@ struct OptixTraceContext::Impl
     }
 };
 
-OptixTraceContext::OptixTraceContext(const Scene& scene, OptixContext* context)
+OptixTraceContext::OptixTraceContext(
+    const Scene&    scene,
+    const int       device_number,
+    const char*     ptx_dir)
   : impl(new Impl)
   , m_scene(scene)
-  , m_context(context)
+  , m_context(device_number, ptx_dir)
 {
     assert(context);
 
@@ -659,7 +662,7 @@ OptixTraceContext::OptixTraceContext(const Scene& scene, OptixContext* context)
 OptixTraceContext::~OptixTraceContext()
 {
     impl->flag_objects_unused();
-    impl->delete_unused(*m_context);
+    impl->delete_unused(m_context);
 
     delete impl;
 }
@@ -673,7 +676,7 @@ void OptixTraceContext::update()
         FlagAsUsedVisitor v(impl->m_objects, impl->m_materials, impl->m_object_instances);
         visit_scene(m_scene, v);
 
-        impl->delete_unused(*m_context);
+        impl->delete_unused(m_context);
     }
 
     // Build / update the OptiX context.
@@ -681,7 +684,7 @@ void OptixTraceContext::update()
         TransformSequenceStack xform_stack;
 
         BuildSceneVisitor v(
-            *m_context,
+            m_context,
             xform_stack,
             impl->m_objects,
             impl->m_materials,

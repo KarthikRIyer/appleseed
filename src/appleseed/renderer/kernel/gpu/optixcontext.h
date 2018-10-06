@@ -47,13 +47,12 @@ class OptixContext
 {
   public:
     // Constructor.
-    explicit OptixContext(const char* ptx_dir);
-
-    // Constructor.
-    OptixContext(const size_t device_number, const char* ptx_dir);
+    OptixContext(const int device_number, const char* ptx_dir);
 
     // Destructor.
     ~OptixContext();
+
+    int get_device_number() const;
 
     // Return the OptiX group representing the scene.
     optix::Group get_scene();

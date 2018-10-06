@@ -40,7 +40,6 @@
 namespace foundation { class IAbortSwitch; }
 namespace renderer   { class IFrameRenderer; }
 namespace renderer   { class ITileCallbackFactory; }
-namespace renderer   { class OptixContext; }
 namespace renderer   { class Project; }
 namespace renderer   { class ParamArray; }
 namespace renderer   { class TextureStore; }
@@ -73,7 +72,8 @@ class GPURenderDevice
 
   private:
     CUDADeviceList&                 m_device_list;
-    std::unique_ptr<OptixContext>   m_optix_context;
+    const char*                     m_ptx_dir;
+    int                             m_cuda_device_number;
 };
 
 }       // namespace renderer

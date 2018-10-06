@@ -96,7 +96,6 @@ namespace renderer      { class Material; }
 namespace renderer      { class Object; }
 namespace renderer      { class OnFrameBeginRecorder; }
 #ifdef APPLESEED_WITH_GPU
-namespace renderer      { class OptixContext; }
 namespace renderer      { class OptixTraceContext; }
 #endif
 namespace renderer      { class PostProcessingStage; }
@@ -206,10 +205,10 @@ class APPLESEED_DLLSYMBOL Project
 
 #ifdef APPLESEED_WITH_GPU
     // Get the OptiX trace context.
-    const OptixTraceContext& get_optix_trace_context(OptixContext* context) const;
+    const OptixTraceContext& get_optix_trace_context() const;
 
     // Synchronize the OptiX trace context with the scene.
-    void update_optix_trace_context();
+    void update_optix_trace_context(const int device_number, const char* ptx_dir);
 #endif
 
   private:

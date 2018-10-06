@@ -29,6 +29,9 @@
 #ifndef APPLESEED_RENDERER_KERNEL_INTERSECTION_OPTIXTRACECONTEXT_H
 #define APPLESEED_RENDERER_KERNEL_INTERSECTION_OPTIXTRACECONTEXT_H
 
+// appleseed.renderer headers.
+#include "renderer/kernel/gpu/optixcontext.h"
+
 // appleseed.foundation headers.
 #include "foundation/core/concepts/noncopyable.h"
 
@@ -36,7 +39,6 @@
 #include "main/dllsymbol.h"
 
 // Forward declarations.
-namespace renderer  { class OptixContext; }
 namespace renderer  { class Scene; }
 
 namespace renderer
@@ -54,7 +56,10 @@ class APPLESEED_DLLSYMBOL OptixTraceContext
 {
   public:
     // Constructor, initializes the trace context for a given scene.
-    explicit OptixTraceContext(const Scene& scene, OptixContext* context);
+    OptixTraceContext(
+        const Scene&    scene,
+        const int       device_number,
+        const char*     ptx_dir);
 
     // Destructor.
     ~OptixTraceContext();
@@ -72,8 +77,8 @@ class APPLESEED_DLLSYMBOL OptixTraceContext
     struct Impl;
     Impl* impl;
 
-    const Scene&    m_scene;
-    OptixContext*   m_context;
+    const Scene&            m_scene;
+    mutable OptixContext    m_context;
 };
 
 
@@ -88,7 +93,7 @@ inline const Scene& OptixTraceContext::get_scene() const
 
 inline OptixContext& OptixTraceContext::get_optix_context() const
 {
-    return *m_context;
+    return m_context;
 }
 
 }       // namespace renderer
