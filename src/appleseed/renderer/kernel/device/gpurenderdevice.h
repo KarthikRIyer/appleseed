@@ -31,12 +31,16 @@
 
 // appleseed.renderer headers.
 #include "renderer/kernel/device/renderdevicebase.h"
-#include "renderer/kernel/gpu/optixcontext.h"
+#include "renderer/kernel/gpu/cudadevice.h"
+
+// Standard headers.
+#include <memory>
 
 // Forward declarations.
 namespace foundation { class IAbortSwitch; }
 namespace renderer   { class IFrameRenderer; }
 namespace renderer   { class ITileCallbackFactory; }
+namespace renderer   { class OptixContext; }
 namespace renderer   { class Project; }
 namespace renderer   { class ParamArray; }
 namespace renderer   { class TextureStore; }
@@ -68,7 +72,8 @@ class GPURenderDevice
         foundation::IAbortSwitch&   abort_switch) override;
 
   private:
-    OptixContext m_optix_context;
+    CUDADeviceList&                 m_device_list;
+    std::unique_ptr<OptixContext>   m_optix_context;
 };
 
 }       // namespace renderer

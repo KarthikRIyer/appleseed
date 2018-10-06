@@ -30,13 +30,24 @@
 #include "gpurenderdevice.h"
 
 // appleseed.renderer headers.
+#include "renderer/kernel/gpu/optixcontext.h"
 #include "renderer/kernel/rendering/iframerenderer.h"
 #include "renderer/modeling/project/project.h"
+
+// appleseed.foundation headers.
+#include "foundation/core/exceptions/exceptioncudaerror.h"
+
+// CUDA headers.
+#include "cuda.h"
 
 using namespace foundation;
 
 namespace renderer
 {
+namespace
+{
+    bool g_cuda_initialized = false;
+}
 
 GPURenderDevice::GPURenderDevice(
     Project&                project,
@@ -44,8 +55,25 @@ GPURenderDevice::GPURenderDevice(
     const char*             ptx_dir,
     IRendererController*    renderer_controller)
   : RenderDeviceBase(project, params, renderer_controller)
-  , m_optix_context(ptx_dir)
+  , m_device_list(CUDADeviceList::instance())
 {
+    // Init CUDA if needed.
+    if (!g_cuda_initialized)
+    {
+        RENDERER_LOG_DEBUG("Initializing CUDA");
+        check_cuda_error(cuInit(0));
+        g_cuda_initialized = true;
+    }
+
+    if (m_device_list.empty())
+        RENDERER_LOG_ERROR("No GPU devices found");
+
+    // todo: pick the best device here.
+    CUDADevice& device = m_device_list.get_device(0);
+
+    device.create_context();
+    m_optix_context.reset(
+        new OptixContext(static_cast<size_t>(device.device_number()), ptx_dir));
 }
 
 GPURenderDevice::~GPURenderDevice()
@@ -61,7 +89,7 @@ bool GPURenderDevice::initialize(
 
 void GPURenderDevice::build_or_update_bvh()
 {
-    m_project.get_optix_trace_context(&m_optix_context);
+    m_project.get_optix_trace_context(m_optix_context.get());
     m_project.update_optix_trace_context();
 }
 
