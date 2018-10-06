@@ -1119,6 +1119,12 @@ set (renderer_kernel_lighting_pt_sources
     renderer/kernel/lighting/pt/ptlightingengine.cpp
     renderer/kernel/lighting/pt/ptlightingengine.h
 )
+if (WITH_OPTIX)
+    list (APPEND renderer_kernel_lighting_pt_sources
+        renderer/kernel/lighting/pt/gpuptlightingengine.cpp
+        renderer/kernel/lighting/pt/gpuptlightingengine.h
+    )
+endif()
 list (APPEND appleseed_sources
     ${renderer_kernel_lighting_pt_sources}
 )
@@ -1181,6 +1187,11 @@ set (renderer_kernel_lighting_sources
     renderer/kernel/lighting/volumelightingintegrator.cpp
     renderer/kernel/lighting/volumelightingintegrator.h
 )
+if (WITH_OPTIX)
+    list (APPEND renderer_kernel_lighting_sources
+        renderer/kernel/lighting/igpulightingengine.h
+    )
+endif()
 list (APPEND appleseed_sources
     ${renderer_kernel_lighting_sources}
 )
@@ -1258,6 +1269,12 @@ set (renderer_kernel_rendering_generic_sources
     renderer/kernel/rendering/generic/tilejobfactory.cpp
     renderer/kernel/rendering/generic/tilejobfactory.h
 )
+if (WITH_OPTIX)
+    list (APPEND renderer_kernel_rendering_generic_sources
+        renderer/kernel/rendering/generic/genericgpuframerenderer.cpp
+        renderer/kernel/rendering/generic/genericgpuframerenderer.h
+    )
+endif()
 list (APPEND appleseed_sources
     ${renderer_kernel_rendering_generic_sources}
 )
@@ -1274,6 +1291,12 @@ set (renderer_kernel_rendering_progressive_sources
     renderer/kernel/rendering/progressive/samplegeneratorjob.cpp
     renderer/kernel/rendering/progressive/samplegeneratorjob.h
 )
+if (WITH_OPTIX)
+    list (APPEND renderer_kernel_rendering_progressive_sources
+        renderer/kernel/rendering/progressive/progressivegpuframerenderer.cpp
+        renderer/kernel/rendering/progressive/progressivegpuframerenderer.h
+    )
+endif()
 list (APPEND appleseed_sources
     ${renderer_kernel_rendering_progressive_sources}
 )
@@ -1332,6 +1355,8 @@ set (renderer_kernel_rendering_sources
 )
 if (WITH_OPTIX)
     list (APPEND renderer_kernel_rendering_sources
+        renderer/kernel/rendering/gpuframerendererbase.cpp
+        renderer/kernel/rendering/gpuframerendererbase.h
         renderer/kernel/rendering/optixrendererservices.cpp
         renderer/kernel/rendering/optixrendererservices.h
     )
