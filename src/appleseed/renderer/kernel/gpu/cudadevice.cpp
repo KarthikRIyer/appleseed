@@ -29,6 +29,9 @@
 // Interface header.
 #include "cudadevice.h"
 
+// appleseed.renderer headers.
+#include "renderer/global/globallogger.h"
+
 // appleseed.foundation headers.
 #include "foundation/core/exceptions/exceptioncudaerror.h"
 
@@ -50,7 +53,10 @@ CUDADevice::CUDADevice(const int device_number)
 CUDADevice::~CUDADevice()
 {
     if (m_context)
+    {
+        RENDERER_LOG_DEBUG("Destryoying CUDA context for device %d", m_device_number);
         cuCtxDestroy(m_context);
+    }
 }
 
 CUDADevice::CUDADevice(CUDADevice&& other)
@@ -67,8 +73,11 @@ int CUDADevice::device_number() const
 
 void CUDADevice::create_context()
 {
-    assert(m_context == nullptr);
-    check_cuda_error(cuCtxCreate(&m_context, 0, m_device_number));
+    if (m_context == nullptr)
+    {
+        RENDERER_LOG_DEBUG("Creating CUDA context for device %d", m_device_number);
+        check_cuda_error(cuCtxCreate(&m_context, 0, m_device_number));
+    }
 }
 
 CUcontext CUDADevice::context() const
@@ -90,6 +99,12 @@ CUDADeviceList::CUDADeviceList()
 
     for (int i = 0; i < device_count; ++i)
         m_devices.emplace_back(i);
+}
+
+CUDADeviceList& CUDADeviceList::instance()
+{
+    static CUDADeviceList x;
+    return x;
 }
 
 bool CUDADeviceList::empty() const

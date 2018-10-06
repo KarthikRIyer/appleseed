@@ -68,7 +68,7 @@ class CUDADeviceList
   : foundation::NonCopyable
 {
   public:
-    CUDADeviceList();
+    static CUDADeviceList& instance();
 
     bool empty() const;
 
@@ -79,6 +79,8 @@ class CUDADeviceList
 
   private:
     std::vector<CUDADevice> m_devices;
+
+    CUDADeviceList();
 };
 
 }       // namespace renderer
