@@ -72,20 +72,27 @@ class Color
 #else
     Color() {}                                  // leave all components uninitialized
 #endif
+    APPLESEED_HOST_DEVICE_INLINE
     explicit Color(const ValueType val);        // set all components to `val`
 
     // Construct a color from another color of a different type.
     template <typename U>
+    APPLESEED_HOST_DEVICE_INLINE
     explicit Color(const Color<U, N>& rhs);
 
     // Construct a color from an array of N scalars.
+    APPLESEED_HOST_DEVICE_INLINE
     static Color from_array(const ValueType* rhs);
 
     // Set all components to a given value.
+    APPLESEED_HOST_DEVICE_INLINE
     void set(const ValueType val);
 
     // Unchecked array subscripting.
+    APPLESEED_HOST_DEVICE_INLINE
     ValueType& operator[](const size_t i);
+
+    APPLESEED_HOST_DEVICE_INLINE
     const ValueType& operator[](const size_t i) const;
 
   private:
@@ -102,82 +109,179 @@ class PoisonImpl<Color<T, N>>
 };
 
 // Exact inequality and equality tests.
-template <typename T, size_t N> bool operator!=(const Color<T, N>& lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> bool operator==(const Color<T, N>& lhs, const Color<T, N>& rhs);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+bool operator!=(const Color<T, N>& lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+bool operator==(const Color<T, N>& lhs, const Color<T, N>& rhs);
 
 // Return whether all components of a color are exactly zero.
-template <typename T, size_t N> bool is_zero(const Color<T, N>& c);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+bool is_zero(const Color<T, N>& c);
 
 // Approximate equality tests.
-template <typename T, size_t N> bool feq(const Color<T, N>& lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> bool feq(const Color<T, N>& lhs, const Color<T, N>& rhs, const T eps);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+bool feq(const Color<T, N>& lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+bool feq(const Color<T, N>& lhs, const Color<T, N>& rhs, const T eps);
 
 // Approximate zero tests.
-template <typename T, size_t N> bool fz(const Color<T, N>& c);
-template <typename T, size_t N> bool fz(const Color<T, N>& c, const T eps);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+bool fz(const Color<T, N>& c);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+bool fz(const Color<T, N>& c, const T eps);
 
 // Color arithmetic.
-template <typename T, size_t N> Color<T, N>  operator+ (const Color<T, N>& lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> Color<T, N>  operator- (const Color<T, N>& lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> Color<T, N>  operator- (const Color<T, N>& lhs);
-template <typename T, size_t N> Color<T, N>  operator* (const Color<T, N>& lhs, const T rhs);
-template <typename T, size_t N> Color<T, N>  operator* (const T lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> Color<T, N>  operator* (const Color<T, N>& lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> Color<T, N>  operator/ (const Color<T, N>& lhs, const T rhs);
-template <typename T, size_t N> Color<T, N>  operator/ (const Color<T, N>& lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> Color<T, N>& operator+=(Color<T, N>& lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> Color<T, N>& operator-=(Color<T, N>& lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> Color<T, N>& operator*=(Color<T, N>& lhs, const T rhs);
-template <typename T, size_t N> Color<T, N>& operator*=(Color<T, N>& lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> Color<T, N>& operator/=(Color<T, N>& lhs, const T rhs);
-template <typename T, size_t N> Color<T, N>& operator/=(Color<T, N>& lhs, const Color<T, N>& rhs);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>  operator+ (const Color<T, N>& lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>  operator- (const Color<T, N>& lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>  operator- (const Color<T, N>& lhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>  operator* (const Color<T, N>& lhs, const T rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>  operator* (const T lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>  operator* (const Color<T, N>& lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>  operator/ (const Color<T, N>& lhs, const T rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>  operator/ (const Color<T, N>& lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator+=(Color<T, N>& lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator-=(Color<T, N>& lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator*=(Color<T, N>& lhs, const T rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator*=(Color<T, N>& lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator/=(Color<T, N>& lhs, const T rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator/=(Color<T, N>& lhs, const Color<T, N>& rhs);
 
 // Component-wise reciprocal.
-template <typename T, size_t N> Color<T, N> rcp(const Color<T, N>& c);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> rcp(const Color<T, N>& c);
 
 // Return whether all components of a color are in [0,1].
-template <typename T, size_t N> bool is_saturated(const Color<T, N>& c);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+bool is_saturated(const Color<T, N>& c);
 
 // Clamp the argument to [0,1].
-template <typename T, size_t N> Color<T, N> saturate(const Color<T, N>& c);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> saturate(const Color<T, N>& c);
 
 // Clamp the argument to [min, max].
-template <typename T, size_t N> Color<T, N> clamp(const Color<T, N>& c, const T min, const T max);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> clamp(const Color<T, N>& c, const T min, const T max);
 
 // Clamp the argument to [min, +infinity).
-template <typename T, size_t N> Color<T, N> clamp_low(const Color<T, N>& c, const T min);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> clamp_low(const Color<T, N>& c, const T min);
 
 // Clamp the argument to (-infinity, max].
-template <typename T, size_t N> Color<T, N> clamp_high(const Color<T, N>& c, const T max);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> clamp_high(const Color<T, N>& c, const T max);
 
 // Return the smallest or largest signed component of a color.
-template <typename T, size_t N> T min_value(const Color<T, N>& c);
-template <typename T, size_t N> T max_value(const Color<T, N>& c);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+T min_value(const Color<T, N>& c);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+T max_value(const Color<T, N>& c);
 
 // Return the index of the smallest or largest signed component of a color.
-template <typename T, size_t N> size_t min_index(const Color<T, N>& c);
-template <typename T, size_t N> size_t max_index(const Color<T, N>& c);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+size_t min_index(const Color<T, N>& c);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+size_t max_index(const Color<T, N>& c);
 
 // Return the index of the smallest or largest component of a color, in absolute value.
-template <typename T, size_t N> size_t min_abs_index(const Color<T, N>& c);
-template <typename T, size_t N> size_t max_abs_index(const Color<T, N>& c);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+size_t min_abs_index(const Color<T, N>& c);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+size_t max_abs_index(const Color<T, N>& c);
 
 // Component-wise min/max of two colors.
-template <typename T, size_t N> Color<T, N> component_wise_min(const Color<T, N>& lhs, const Color<T, N>& rhs);
-template <typename T, size_t N> Color<T, N> component_wise_max(const Color<T, N>& lhs, const Color<T, N>& rhs);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> component_wise_min(const Color<T, N>& lhs, const Color<T, N>& rhs);
+
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> component_wise_max(const Color<T, N>& lhs, const Color<T, N>& rhs);
 
 // Return the sum of the components of a color.
-template <typename T, size_t N> T sum_value(const Color<T, N>& c);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+T sum_value(const Color<T, N>& c);
 
 // Return the average value of a color.
-template <typename T, size_t N> T average_value(const Color<T, N>& c);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+T average_value(const Color<T, N>& c);
 
 // Return true if a color contains at least one NaN value.
-template <typename T, size_t N> bool has_nan(const Color<T, N>& c);
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+bool has_nan(const Color<T, N>& c);
 
 // Return true if all components of a color are finite (not NaN, not infinite).
-template <typename T, size_t N> bool is_finite(const Color<T, N>& c);
-
+template <typename T, size_t N>
+APPLESEED_HOST_DEVICE_INLINE
+bool is_finite(const Color<T, N>& c);
 
 //
 // RGB color class of arbitrary type.
@@ -200,7 +304,10 @@ class Color<T, 3>
 #else
     Color() {}                                  // leave all components uninitialized
 #endif
+    APPLESEED_HOST_DEVICE_INLINE
     explicit Color(const ValueType val);        // set all components to `val`
+
+    APPLESEED_HOST_DEVICE_INLINE
     Color(                                      // set individual components
         const ValueType r,
         const ValueType g,
@@ -208,6 +315,7 @@ class Color<T, 3>
 
     // Construct a color from another color of a different type.
     template <typename U>
+    APPLESEED_HOST_DEVICE_INLINE
     Color(const Color<U, 3>& rhs);
 
 #ifdef APPLESEED_ENABLE_IMATH_INTEROP
@@ -222,23 +330,30 @@ class Color<T, 3>
 #endif
 
     // Construct a color from an array of 3 scalars.
+    APPLESEED_HOST_DEVICE_INLINE
     static Color from_array(const ValueType* rhs);
 
     // Set all components to a given value.
+    APPLESEED_HOST_DEVICE_INLINE
     void set(const ValueType val);
 
     // Unchecked array subscripting.
+    APPLESEED_HOST_DEVICE_INLINE
     ValueType& operator[](const size_t i);
+
+    APPLESEED_HOST_DEVICE_INLINE
     const ValueType& operator[](const size_t i) const;
 };
 
 // Matrix-color multiplication.
 template <typename T>
+APPLESEED_HOST_DEVICE_INLINE
 Color<T, 3> operator*(
     const Matrix<T, 3, 3>&  m,
     const Color<T, 3>&      c);
 
 template <typename T>
+APPLESEED_HOST_DEVICE_INLINE
 Color<T, 3> operator*(
     const Color<T, 3>&      c,
     const Matrix<T, 3, 3>&  m);
@@ -249,7 +364,7 @@ Color<T, 3> operator*(
 //
 
 template <typename T>
-class Color<T, 4>
+class APPLESEED_DEVICE_ALIGN(16) Color<T, 4>
 {
   public:
     // Value type and number of components.
@@ -265,10 +380,15 @@ class Color<T, 4>
 #else
     Color() {}                                  // leave all components uninitialized
 #endif
+    APPLESEED_HOST_DEVICE_INLINE
     explicit Color(const ValueType val);        // set all components to `val`
+
+    APPLESEED_HOST_DEVICE_INLINE
     Color(
         const Color<T, 3>&  rgb,
         const ValueType     a);
+
+    APPLESEED_HOST_DEVICE_INLINE
     Color(                                      // set individual components
         const ValueType     r,
         const ValueType     g,
@@ -277,6 +397,7 @@ class Color<T, 4>
 
     // Construct a color from another color of a different type.
     template <typename U>
+    APPLESEED_HOST_DEVICE_INLINE
     Color(const Color<U, 4>& rhs);
 
 #ifdef APPLESEED_ENABLE_IMATH_INTEROP
@@ -291,17 +412,25 @@ class Color<T, 4>
 #endif
 
     // Construct a color from an array of 4 scalars.
+    APPLESEED_HOST_DEVICE_INLINE
     static Color from_array(const ValueType* rhs);
 
     // Set all components to a given value.
+    APPLESEED_HOST_DEVICE_INLINE
     void set(const ValueType val);
 
     // Access the color as a 3-component color.
+    APPLESEED_HOST_DEVICE_INLINE
     Color<ValueType, 3>& rgb();
+
+    APPLESEED_HOST_DEVICE_INLINE
     const Color<ValueType, 3>& rgb() const;
 
     // Unchecked array subscripting.
+    APPLESEED_HOST_DEVICE_INLINE
     ValueType& operator[](const size_t i);
+
+    APPLESEED_HOST_DEVICE_INLINE
     const ValueType& operator[](const size_t i) const;
 
     //
@@ -314,11 +443,17 @@ class Color<T, 4>
     //
 
     // Apply/undo alpha premultiplication in place.
+    APPLESEED_HOST_DEVICE_INLINE
     void premultiply_in_place();
+
+    APPLESEED_HOST_DEVICE_INLINE
     void unpremultiply_in_place();
 
     // Retrieve premultiplied/unpremultiplied copies of this color.
+    APPLESEED_HOST_DEVICE_INLINE
     Color premultiplied() const;
+
+    APPLESEED_HOST_DEVICE_INLINE
     Color unpremultiplied() const;
 };
 
@@ -342,6 +477,7 @@ typedef Color<double,   4> Color4d;
 
 // Compute a color from a given integer.
 template <typename T, typename Int>
+APPLESEED_HOST_DEVICE_INLINE
 Color<T, 3> integer_to_color3(const Int i);
 
 
@@ -350,21 +486,24 @@ Color<T, 3> integer_to_color3(const Int i);
 //
 
 template <typename T, size_t N>
-inline Color<T, N>::Color(const ValueType val)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>::Color(const ValueType val)
 {
     set(val);
 }
 
 template <typename T, size_t N>
 template <typename U>
-inline Color<T, N>::Color(const Color<U, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>::Color(const Color<U, N>& rhs)
 {
     for (size_t i = 0; i < N; ++i)
         m_comp[i] = static_cast<ValueType>(rhs.m_comp[i]);
 }
 
 template <typename T, size_t N>
-inline Color<T, N> Color<T, N>::from_array(const ValueType* rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> Color<T, N>::from_array(const ValueType* rhs)
 {
     assert(rhs);
 
@@ -377,21 +516,24 @@ inline Color<T, N> Color<T, N>::from_array(const ValueType* rhs)
 }
 
 template <typename T, size_t N>
-inline void Color<T, N>::set(const ValueType val)
+APPLESEED_HOST_DEVICE_INLINE
+void Color<T, N>::set(const ValueType val)
 {
     for (size_t i = 0; i < N; ++i)
         m_comp[i] = val;
 }
 
 template <typename T, size_t N>
-inline T& Color<T, N>::operator[](const size_t i)
+APPLESEED_HOST_DEVICE_INLINE
+T& Color<T, N>::operator[](const size_t i)
 {
     assert(i < Components);
     return m_comp[i];
 }
 
 template <typename T, size_t N>
-inline const T& Color<T, N>::operator[](const size_t i) const
+APPLESEED_HOST_DEVICE_INLINE
+const T& Color<T, N>::operator[](const size_t i) const
 {
     assert(i < Components);
     return m_comp[i];
@@ -405,7 +547,8 @@ void PoisonImpl<Color<T, N>>::do_poison(Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline bool operator!=(const Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+bool operator!=(const Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     for (size_t i = 0; i < N; ++i)
     {
@@ -417,13 +560,15 @@ inline bool operator!=(const Color<T, N>& lhs, const Color<T, N>& rhs)
 }
 
 template <typename T, size_t N>
-inline bool operator==(const Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+bool operator==(const Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     return !(lhs != rhs);
 }
 
 template <typename T, size_t N>
-inline bool is_zero(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+bool is_zero(const Color<T, N>& c)
 {
     for (size_t i = 0; i < N; ++i)
     {
@@ -435,7 +580,8 @@ inline bool is_zero(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline bool feq(const Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+bool feq(const Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     for (size_t i = 0; i < N; ++i)
     {
@@ -447,7 +593,8 @@ inline bool feq(const Color<T, N>& lhs, const Color<T, N>& rhs)
 }
 
 template <typename T, size_t N>
-inline bool feq(const Color<T, N>& lhs, const Color<T, N>& rhs, const T eps)
+APPLESEED_HOST_DEVICE_INLINE
+bool feq(const Color<T, N>& lhs, const Color<T, N>& rhs, const T eps)
 {
     for (size_t i = 0; i < N; ++i)
     {
@@ -459,7 +606,8 @@ inline bool feq(const Color<T, N>& lhs, const Color<T, N>& rhs, const T eps)
 }
 
 template <typename T, size_t N>
-inline bool fz(const Color<T, N>& v)
+APPLESEED_HOST_DEVICE_INLINE
+bool fz(const Color<T, N>& v)
 {
     for (size_t i = 0; i < N; ++i)
     {
@@ -471,7 +619,8 @@ inline bool fz(const Color<T, N>& v)
 }
 
 template <typename T, size_t N>
-inline bool fz(const Color<T, N>& v, const T eps)
+APPLESEED_HOST_DEVICE_INLINE
+bool fz(const Color<T, N>& v, const T eps)
 {
     for (size_t i = 0; i < N; ++i)
     {
@@ -483,7 +632,8 @@ inline bool fz(const Color<T, N>& v, const T eps)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> operator+(const Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> operator+(const Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     Color<T, N> result;
 
@@ -494,7 +644,8 @@ inline Color<T, N> operator+(const Color<T, N>& lhs, const Color<T, N>& rhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> operator-(const Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> operator-(const Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     Color<T, N> result;
 
@@ -505,7 +656,8 @@ inline Color<T, N> operator-(const Color<T, N>& lhs, const Color<T, N>& rhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> operator-(const Color<T, N>& lhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> operator-(const Color<T, N>& lhs)
 {
     Color<T, N> result;
 
@@ -516,7 +668,8 @@ inline Color<T, N> operator-(const Color<T, N>& lhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> operator*(const Color<T, N>& lhs, const T rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> operator*(const Color<T, N>& lhs, const T rhs)
 {
     Color<T, N> result;
 
@@ -527,13 +680,15 @@ inline Color<T, N> operator*(const Color<T, N>& lhs, const T rhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> operator*(const T lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> operator*(const T lhs, const Color<T, N>& rhs)
 {
     return rhs * lhs;
 }
 
 template <typename T, size_t N>
-inline Color<T, N> operator*(const Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> operator*(const Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     Color<T, N> result;
 
@@ -544,7 +699,8 @@ inline Color<T, N> operator*(const Color<T, N>& lhs, const Color<T, N>& rhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> operator/(const Color<T, N>& lhs, const T rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> operator/(const Color<T, N>& lhs, const T rhs)
 {
     Color<T, N> result;
 
@@ -555,25 +711,28 @@ inline Color<T, N> operator/(const Color<T, N>& lhs, const T rhs)
 }
 
 template <size_t N>
-inline Color<float, N> operator/(const Color<float, N>& lhs, const float rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<float, N> operator/(const Color<float, N>& lhs, const float rhs)
 {
     return lhs * (1.0f / rhs);
 }
 
 template <size_t N>
-inline Color<double, N> operator/(const Color<double, N>& lhs, const double rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<double, N> operator/(const Color<double, N>& lhs, const double rhs)
 {
     return lhs * (1.0 / rhs);
 }
 
 template <size_t N>
-inline Color<long double, N> operator/(const Color<long double, N>& lhs, const long double rhs)
+Color<long double, N> operator/(const Color<long double, N>& lhs, const long double rhs)
 {
     return lhs * (1.0L / rhs);
 }
 
 template <typename T, size_t N>
-inline Color<T, N> operator/(const Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> operator/(const Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     Color<T, N> result;
 
@@ -584,7 +743,8 @@ inline Color<T, N> operator/(const Color<T, N>& lhs, const Color<T, N>& rhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N>& operator+=(Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator+=(Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     for (size_t i = 0; i < N; ++i)
         lhs[i] += rhs[i];
@@ -593,7 +753,8 @@ inline Color<T, N>& operator+=(Color<T, N>& lhs, const Color<T, N>& rhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N>& operator-=(Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator-=(Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     for (size_t i = 0; i < N; ++i)
         lhs[i] -= rhs[i];
@@ -602,7 +763,8 @@ inline Color<T, N>& operator-=(Color<T, N>& lhs, const Color<T, N>& rhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N>& operator*=(Color<T, N>& lhs, const T rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator*=(Color<T, N>& lhs, const T rhs)
 {
     for (size_t i = 0; i < N; ++i)
         lhs[i] *= rhs;
@@ -611,7 +773,8 @@ inline Color<T, N>& operator*=(Color<T, N>& lhs, const T rhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N>& operator*=(Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator*=(Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     for (size_t i = 0; i < N; ++i)
         lhs[i] *= rhs[i];
@@ -620,7 +783,8 @@ inline Color<T, N>& operator*=(Color<T, N>& lhs, const Color<T, N>& rhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N>& operator/=(Color<T, N>& lhs, const T rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator/=(Color<T, N>& lhs, const T rhs)
 {
     for (size_t i = 0; i < N; ++i)
         lhs[i] /= rhs;
@@ -629,25 +793,28 @@ inline Color<T, N>& operator/=(Color<T, N>& lhs, const T rhs)
 }
 
 template <size_t N>
-inline Color<float, N>& operator/=(Color<float, N>& lhs, const float rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<float, N>& operator/=(Color<float, N>& lhs, const float rhs)
 {
     return lhs *= 1.0f / rhs;
 }
 
 template <size_t N>
-inline Color<double, N>& operator/=(Color<double, N>& lhs, const double rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<double, N>& operator/=(Color<double, N>& lhs, const double rhs)
 {
     return lhs *= 1.0 / rhs;
 }
 
 template <size_t N>
-inline Color<long double, N>& operator/=(Color<long double, N>& lhs, const long double rhs)
+Color<long double, N>& operator/=(Color<long double, N>& lhs, const long double rhs)
 {
     return lhs *= 1.0L / rhs;
 }
 
 template <typename T, size_t N>
-inline Color<T, N>& operator/=(Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N>& operator/=(Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     for (size_t i = 0; i < N; ++i)
         lhs[i] /= rhs[i];
@@ -656,7 +823,8 @@ inline Color<T, N>& operator/=(Color<T, N>& lhs, const Color<T, N>& rhs)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> rcp(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> rcp(const Color<T, N>& c)
 {
     Color<T, N> result;
 
@@ -667,7 +835,8 @@ inline Color<T, N> rcp(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline bool is_saturated(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+bool is_saturated(const Color<T, N>& c)
 {
     for (size_t i = 0; i < N; ++i)
     {
@@ -679,7 +848,8 @@ inline bool is_saturated(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> saturate(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> saturate(const Color<T, N>& c)
 {
     Color<T, N> result;
 
@@ -690,7 +860,8 @@ inline Color<T, N> saturate(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> clamp(const Color<T, N>& c, const T min, const T max)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> clamp(const Color<T, N>& c, const T min, const T max)
 {
     Color<T, N> result;
 
@@ -701,7 +872,8 @@ inline Color<T, N> clamp(const Color<T, N>& c, const T min, const T max)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> clamp_low(const Color<T, N>& c, const T min)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> clamp_low(const Color<T, N>& c, const T min)
 {
     Color<T, N> result;
 
@@ -712,7 +884,8 @@ inline Color<T, N> clamp_low(const Color<T, N>& c, const T min)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> clamp_high(const Color<T, N>& c, const T max)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> clamp_high(const Color<T, N>& c, const T max)
 {
     Color<T, N> result;
 
@@ -723,7 +896,8 @@ inline Color<T, N> clamp_high(const Color<T, N>& c, const T max)
 }
 
 template <typename T, size_t N>
-inline T min_value(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+T min_value(const Color<T, N>& c)
 {
     T value = c[0];
 
@@ -737,7 +911,8 @@ inline T min_value(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline T max_value(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+T max_value(const Color<T, N>& c)
 {
     T value = c[0];
 
@@ -751,7 +926,8 @@ inline T max_value(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline size_t min_index(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+size_t min_index(const Color<T, N>& c)
 {
     size_t index = 0;
     T value = c[0];
@@ -771,7 +947,8 @@ inline size_t min_index(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline size_t max_index(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+size_t max_index(const Color<T, N>& c)
 {
     size_t index = 0;
     T value = c[0];
@@ -791,7 +968,8 @@ inline size_t max_index(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline size_t min_abs_index(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+size_t min_abs_index(const Color<T, N>& c)
 {
     size_t index = 0;
     T value = std::abs(c[0]);
@@ -811,7 +989,8 @@ inline size_t min_abs_index(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline size_t max_abs_index(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+size_t max_abs_index(const Color<T, N>& c)
 {
     size_t index = 0;
     T value = std::abs(c[0]);
@@ -831,7 +1010,8 @@ inline size_t max_abs_index(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline Color<T, N> component_wise_min(const Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> component_wise_min(const Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     Color<T, N> result;
 
@@ -842,7 +1022,8 @@ inline Color<T, N> component_wise_min(const Color<T, N>& lhs, const Color<T, N>&
 }
 
 template <typename T, size_t N>
-inline Color<T, N> component_wise_max(const Color<T, N>& lhs, const Color<T, N>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, N> component_wise_max(const Color<T, N>& lhs, const Color<T, N>& rhs)
 {
     Color<T, N> result;
 
@@ -853,7 +1034,8 @@ inline Color<T, N> component_wise_max(const Color<T, N>& lhs, const Color<T, N>&
 }
 
 template <typename T, size_t N>
-inline T sum_value(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+T sum_value(const Color<T, N>& c)
 {
     T sum = c[0];
 
@@ -864,13 +1046,15 @@ inline T sum_value(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline T average_value(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+T average_value(const Color<T, N>& c)
 {
     return sum_value(c) / N;
 }
 
 template <typename T, size_t N>
-inline bool has_nan(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+bool has_nan(const Color<T, N>& c)
 {
     for (size_t i = 0; i < N; ++i)
     {
@@ -882,7 +1066,8 @@ inline bool has_nan(const Color<T, N>& c)
 }
 
 template <typename T, size_t N>
-inline bool is_finite(const Color<T, N>& c)
+APPLESEED_HOST_DEVICE_INLINE
+bool is_finite(const Color<T, N>& c)
 {
     for (size_t i = 0; i < N; ++i)
     {
@@ -899,7 +1084,8 @@ inline bool is_finite(const Color<T, N>& c)
 //
 
 template <typename T>
-inline Color<T, 3>::Color(const ValueType val)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 3>::Color(const ValueType val)
   : r(val)
   , g(val)
   , b(val)
@@ -907,7 +1093,8 @@ inline Color<T, 3>::Color(const ValueType val)
 }
 
 template <typename T>
-inline Color<T, 3>::Color(
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 3>::Color(
     const ValueType r_,
     const ValueType g_,
     const ValueType b_)
@@ -919,7 +1106,8 @@ inline Color<T, 3>::Color(
 
 template <typename T>
 template <typename U>
-inline Color<T, 3>::Color(const Color<U, 3>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 3>::Color(const Color<U, 3>& rhs)
   : r(static_cast<ValueType>(rhs.r))
   , g(static_cast<ValueType>(rhs.g))
   , b(static_cast<ValueType>(rhs.b))
@@ -951,34 +1139,39 @@ inline Color<T, 3>::operator const Imath::Color3<T>&() const
 #endif
 
 template <typename T>
-inline Color<T, 3> Color<T, 3>::from_array(const ValueType* rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 3> Color<T, 3>::from_array(const ValueType* rhs)
 {
     assert(rhs);
     return Color(rhs[0], rhs[1], rhs[2]);
 }
 
 template <typename T>
-inline void Color<T, 3>::set(const ValueType val)
+APPLESEED_HOST_DEVICE_INLINE
+void Color<T, 3>::set(const ValueType val)
 {
     r = g = b = val;
 }
 
 template <typename T>
-inline T& Color<T, 3>::operator[](const size_t i)
+APPLESEED_HOST_DEVICE_INLINE
+T& Color<T, 3>::operator[](const size_t i)
 {
     assert(i < Components);
     return (&r)[i];
 }
 
 template <typename T>
-inline const T& Color<T, 3>::operator[](const size_t i) const
+APPLESEED_HOST_DEVICE_INLINE
+const T& Color<T, 3>::operator[](const size_t i) const
 {
     assert(i < Components);
     return (&r)[i];
 }
 
 template <typename T>
-inline Color<T, 3> operator*(
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 3> operator*(
     const Matrix<T, 3, 3>&  m,
     const Color<T, 3>&      c)
 {
@@ -992,7 +1185,8 @@ inline Color<T, 3> operator*(
 }
 
 template <typename T>
-inline Color<T, 3> operator*(
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 3> operator*(
     const Color<T, 3>&      c,
     const Matrix<T, 3, 3>&  m)
 {
@@ -1011,7 +1205,8 @@ inline Color<T, 3> operator*(
 //
 
 template <typename T>
-inline Color<T, 4>::Color(const ValueType val)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 4>::Color(const ValueType val)
   : r(val)
   , g(val)
   , b(val)
@@ -1020,7 +1215,8 @@ inline Color<T, 4>::Color(const ValueType val)
 }
 
 template <typename T>
-inline Color<T, 4>::Color(
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 4>::Color(
     const Color<T, 3>&  rgb,
     const ValueType     a_)
   : r(rgb.r)
@@ -1031,7 +1227,8 @@ inline Color<T, 4>::Color(
 }
 
 template <typename T>
-inline Color<T, 4>::Color(
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 4>::Color(
     const ValueType     r_,
     const ValueType     g_,
     const ValueType     b_,
@@ -1045,7 +1242,8 @@ inline Color<T, 4>::Color(
 
 template <typename T>
 template <typename U>
-inline Color<T, 4>::Color(const Color<U, 4>& rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 4>::Color(const Color<U, 4>& rhs)
   : r(static_cast<ValueType>(rhs.r))
   , g(static_cast<ValueType>(rhs.g))
   , b(static_cast<ValueType>(rhs.b))
@@ -1079,46 +1277,53 @@ inline Color<T, 4>::operator const Imath::Color4<T>&() const
 #endif
 
 template <typename T>
-inline Color<T, 4> Color<T, 4>::from_array(const ValueType* rhs)
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 4> Color<T, 4>::from_array(const ValueType* rhs)
 {
     assert(rhs);
     return Color(rhs[0], rhs[1], rhs[2], rhs[3]);
 }
 
 template <typename T>
-inline void Color<T, 4>::set(const ValueType val)
+APPLESEED_HOST_DEVICE_INLINE
+void Color<T, 4>::set(const ValueType val)
 {
     r = g = b = a = val;
 }
 
 template <typename T>
-inline Color<T, 3>& Color<T, 4>::rgb()
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 3>& Color<T, 4>::rgb()
 {
     return *reinterpret_cast<Color<T, 3>*>(&r);
 }
 
 template <typename T>
-inline const Color<T, 3>& Color<T, 4>::rgb() const
+APPLESEED_HOST_DEVICE_INLINE
+const Color<T, 3>& Color<T, 4>::rgb() const
 {
     return *reinterpret_cast<const Color<T, 3>*>(&r);
 }
 
 template <typename T>
-inline T& Color<T, 4>::operator[](const size_t i)
+APPLESEED_HOST_DEVICE_INLINE
+T& Color<T, 4>::operator[](const size_t i)
 {
     assert(i < Components);
     return (&r)[i];
 }
 
 template <typename T>
-inline const T& Color<T, 4>::operator[](const size_t i) const
+APPLESEED_HOST_DEVICE_INLINE
+const T& Color<T, 4>::operator[](const size_t i) const
 {
     assert(i < Components);
     return (&r)[i];
 }
 
 template <typename T>
-inline void Color<T, 4>::premultiply_in_place()
+APPLESEED_HOST_DEVICE_INLINE
+void Color<T, 4>::premultiply_in_place()
 {
     r *= a;
     g *= a;
@@ -1126,7 +1331,8 @@ inline void Color<T, 4>::premultiply_in_place()
 }
 
 template <typename T>
-inline void Color<T, 4>::unpremultiply_in_place()
+APPLESEED_HOST_DEVICE_INLINE
+void Color<T, 4>::unpremultiply_in_place()
 {
     if (a != T(0.0))
     {
@@ -1138,7 +1344,8 @@ inline void Color<T, 4>::unpremultiply_in_place()
 }
 
 template <typename T>
-inline Color<T, 4> Color<T, 4>:: premultiplied() const
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 4> Color<T, 4>:: premultiplied() const
 {
     return
         Color(
@@ -1149,7 +1356,8 @@ inline Color<T, 4> Color<T, 4>:: premultiplied() const
 }
 
 template <typename T>
-inline Color<T, 4> Color<T, 4>::unpremultiplied() const
+APPLESEED_HOST_DEVICE_INLINE
+Color<T, 4> Color<T, 4>::unpremultiplied() const
 {
     if (a != T(0.0))
     {
@@ -1170,6 +1378,7 @@ inline Color<T, 4> Color<T, 4>::unpremultiplied() const
 //
 
 template <typename T, typename Int>
+APPLESEED_HOST_DEVICE_INLINE
 Color<T, 3> integer_to_color3(const Int i)
 {
     const uint32 u = static_cast<uint32>(i);    // keep the low 32 bits
