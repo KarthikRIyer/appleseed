@@ -30,11 +30,15 @@
 #include "gpurenderdevice.h"
 
 // appleseed.renderer headers.
+#include "renderer/kernel/intersection/optixtracecontext.h"
 #include "renderer/kernel/rendering/iframerenderer.h"
 #include "renderer/modeling/project/project.h"
 
 // appleseed.foundation headers.
 #include "foundation/core/exceptions/exceptioncudaerror.h"
+
+// OptiX headers.
+#include "optixu/optixpp.h"
 
 // CUDA headers.
 #include "cuda.h"
@@ -54,7 +58,7 @@ GPURenderDevice::GPURenderDevice(
     const char*             ptx_dir,
     IRendererController*    renderer_controller)
   : RenderDeviceBase(project, params, renderer_controller)
-  , m_device_list(CUDADeviceList::instance())
+  , m_ptx_dir(ptx_dir)
 {
     // Init CUDA if needed.
     if (!g_cuda_initialized)
@@ -64,12 +68,12 @@ GPURenderDevice::GPURenderDevice(
         g_cuda_initialized = true;
     }
 
-    if (m_device_list.empty())
+    CUDADeviceList& device_list = CUDADeviceList::instance();
+
+    if (device_list.empty())
         RENDERER_LOG_ERROR("No GPU devices found");
 
-    // todo: pick the best device here.
-    CUDADevice& device = m_device_list.get_device(0);
-    m_cuda_device_number = device.device_number();
+    m_cuda_device = &device_list.pick_best_device();
 }
 
 GPURenderDevice::~GPURenderDevice()
@@ -83,9 +87,19 @@ bool GPURenderDevice::initialize(
     return true;
 }
 
-void GPURenderDevice::build_or_update_bvh()
+bool GPURenderDevice::build_or_update_bvh()
 {
-    m_project.update_optix_trace_context(m_cuda_device_number, m_ptx_dir);
+    try
+    {
+        m_project.update_optix_trace_context(m_cuda_device->m_device_number, m_ptx_dir);
+    }
+    catch(const optix::Exception& e)
+    {
+        RENDERER_LOG_ERROR("Error while updating OptiX context: %s\n", e.what());
+        return false;
+    }
+
+    return true;
 }
 
 IRendererController::Status GPURenderDevice::render_frame(
@@ -93,6 +107,23 @@ IRendererController::Status GPURenderDevice::render_frame(
     TextureStore&           texture_store,
     IAbortSwitch&           abort_switch)
 {
+    try
+    {
+        // ...
+    }
+    catch(const optix::Exception& e)
+    {
+        RENDERER_LOG_ERROR("OptiX error: %s\n", e.what());
+    }
+    catch(const ExceptionCUDAError& e)
+    {
+        RENDERER_LOG_ERROR("CUDA error: %s\n", e.what());
+    }
+    catch(const Exception& e)
+    {
+        RENDERER_LOG_ERROR("Exception: %s\n", e.what());
+    }
+
     return IRendererController::AbortRendering;
 }
 

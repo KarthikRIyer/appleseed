@@ -63,7 +63,7 @@ class GPURenderDevice
         TextureStore&               texture_store,
         foundation::IAbortSwitch&   abort_switch) override;
 
-    void build_or_update_bvh() override;
+    bool build_or_update_bvh() override;
 
     IRendererController::Status render_frame(
         ITileCallbackFactory*       tile_callback_factory,
@@ -73,9 +73,8 @@ class GPURenderDevice
     void print_settings() const override;
 
   private:
-    CUDADeviceList&                 m_device_list;
-    const char*                     m_ptx_dir;
-    int                             m_cuda_device_number;
+    const char*         m_ptx_dir;
+    const CUDADevice*   m_cuda_device;
 };
 
 }       // namespace renderer

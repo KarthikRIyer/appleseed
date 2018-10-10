@@ -63,15 +63,36 @@ PTXCache::PTXCache(const char* ptx_path)
 {
 }
 
-CUmodule PTXCache::create_cuda_module(const char* ptx_filename)
+namespace
+{
+
+struct ModuleDeleter
+{
+    void operator()(CUmodule* mod) const
+    {
+        cuModuleUnload(*mod);
+        delete mod;
+    }
+};
+
+}
+
+std::shared_ptr<CUmodule> PTXCache::create_cuda_module(
+    const char*     ptx_filename)
 {
     CUmodule module;
-    CUresult result = cuModuleLoadDataEx(&module, get_ptx_code(ptx_filename).c_str(), 0, nullptr, nullptr);
+    CUresult result =
+        cuModuleLoadDataEx(
+            &module,
+            get_ptx_code(ptx_filename).c_str(),
+            0,
+            nullptr,
+            nullptr);
 
     if (result != CUDA_SUCCESS)
         throw ExceptionCUDAError(result);
 
-    return module;
+    return std::shared_ptr<CUmodule>(new CUmodule(module), ModuleDeleter());
 }
 
 optix::Program PTXCache::create_optix_program(
@@ -79,7 +100,9 @@ optix::Program PTXCache::create_optix_program(
     const char*     ptx_filename,
     const char*     program_name)
 {
-    return context->createProgramFromPTXString(get_ptx_code(ptx_filename), program_name);
+    return context->createProgramFromPTXString(
+        get_ptx_code(ptx_filename),
+        program_name);
 }
 
 const std::string& PTXCache::get_ptx_code(const char* filename)
@@ -89,16 +112,17 @@ const std::string& PTXCache::get_ptx_code(const char* filename)
     if (it == m_ptx_code.end())
     {
         bfs::path p(m_ptx_path / filename);
+        const char* filepath = p.string().c_str();
         it =
-            m_ptx_code.insert(make_pair(filename, read_source_file(p.string().c_str()))).first;
+            m_ptx_code.insert(make_pair(filename, read_source_file(filepath))).first;
     }
 
     return it->second;
 }
 
-string PTXCache::read_source_file(const string& filename)
+string PTXCache::read_source_file(const char* filepath)
 {
-    ifstream file(filename.c_str());
+    ifstream file(filepath);
 
     if (file.good())
     {
@@ -107,7 +131,7 @@ string PTXCache::read_source_file(const string& filename)
         return source_buffer.str();
     }
 
-    throw ExceptionCannotLoadPTX(filename.c_str());
+    throw ExceptionCannotLoadPTX(filepath);
     return string();
 }
 

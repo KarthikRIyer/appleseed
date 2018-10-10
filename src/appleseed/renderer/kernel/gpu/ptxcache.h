@@ -45,6 +45,7 @@
 
 // Standard headers.
 #include <map>
+#include <memory>
 #include <string>
 
 namespace renderer
@@ -74,7 +75,7 @@ class PTXCache
     // Constructor.
     explicit PTXCache(const char* ptx_dir);
 
-    CUmodule create_cuda_module(const char* ptx_filename);
+    std::shared_ptr<CUmodule> create_cuda_module(const char* ptx_filename);
 
     optix::Program create_optix_program(
         optix::Context& context,
@@ -87,7 +88,7 @@ class PTXCache
 
     const std::string& get_ptx_code(const char* filename);
 
-    std::string read_source_file(const std::string& filename);
+    static std::string read_source_file(const char* filepath);
 };
 
 }       // namespace renderer

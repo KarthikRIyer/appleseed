@@ -36,7 +36,6 @@
 #include "foundation/core/exceptions/exceptioncudaerror.h"
 
 // Standard headers.
-#include <algorithm>
 #include <cassert>
 
 using namespace foundation;
@@ -44,51 +43,48 @@ using namespace foundation;
 namespace renderer
 {
 
-CUDADevice::CUDADevice(const int device_number)
+CUDADevice::CUDADevice(const CUdevice device_number)
   : m_device_number(device_number)
-  , m_context(nullptr)
 {
+    char device_name[256];
+    cuDeviceGetName(device_name, 256, m_device_number);
+    m_name = device_name;
+
+    cuDeviceComputeCapability(
+        &m_compute_capability.first,
+        &m_compute_capability.second,
+        m_device_number);
+
+    cuDeviceGetAttribute(&m_compute_mode, CU_DEVICE_ATTRIBUTE_COMPUTE_MODE, m_device_number);
+
+    cuDeviceTotalMem(&m_total_mem, m_device_number);
+
+    cuDeviceGetAttribute(&m_max_threads_per_block, CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_BLOCK, m_device_number);
+
+    cuDeviceGetAttribute(&m_max_block_dim_x, CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_X, m_device_number);
+    cuDeviceGetAttribute(&m_max_block_dim_y, CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_Y, m_device_number);
+    cuDeviceGetAttribute(&m_max_block_dim_z, CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_Z, m_device_number);
+
+    cuDeviceGetAttribute(&m_max_grid_dim_x, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X, m_device_number);
+    cuDeviceGetAttribute(&m_max_grid_dim_y, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y, m_device_number);
+    cuDeviceGetAttribute(&m_max_grid_dim_z, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z, m_device_number);
+
+    cuDeviceGetAttribute(&m_max_registers, CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK, m_device_number);
 }
 
-CUDADevice::~CUDADevice()
+namespace
 {
-    if (m_context)
-    {
-        RENDERER_LOG_DEBUG("Destryoying CUDA context for device %d", m_device_number);
-        cuCtxDestroy(m_context);
-    }
+
+bool is_device_supported(const CUDADevice& device)
+{
+    if (device.m_compute_mode == CU_COMPUTEMODE_PROHIBITED)
+        return false;
+
+    // todo: check more things here...
+
+    return true;
 }
 
-CUDADevice::CUDADevice(CUDADevice&& other)
-  : m_device_number(other.m_device_number)
-  , m_context(other.m_context)
-{
-    other.m_context = nullptr;
-}
-
-int CUDADevice::device_number() const
-{
-    return m_device_number;
-}
-
-void CUDADevice::create_context()
-{
-    if (m_context == nullptr)
-    {
-        RENDERER_LOG_DEBUG("Creating CUDA context for device %d", m_device_number);
-        check_cuda_error(cuCtxCreate(&m_context, 0, m_device_number));
-    }
-}
-
-CUcontext CUDADevice::context() const
-{
-    return m_context;
-}
-
-void CUDADevice::set_context_current() const
-{
-    assert(m_context);
-    cuCtxSetCurrent(m_context);
 }
 
 CUDADeviceList::CUDADeviceList()
@@ -96,9 +92,24 @@ CUDADeviceList::CUDADeviceList()
     int device_count;
     check_cuda_error(cuDeviceGetCount(&device_count));
     m_devices.reserve(static_cast<size_t>(device_count));
+    m_contexts.resize(static_cast<size_t>(device_count), nullptr);
 
     for (int i = 0; i < device_count; ++i)
-        m_devices.emplace_back(i);
+    {
+        CUDADevice device(i);
+
+        if (is_device_supported(device))
+            m_devices.push_back(device);
+    }
+}
+
+CUDADeviceList::~CUDADeviceList()
+{
+    for (size_t i = 0, e = m_contexts.size(); i < e; ++i)
+    {
+        if (m_contexts[i] != nullptr)
+            cuDevicePrimaryCtxRelease(static_cast<CUdevice>(i));
+    }
 }
 
 CUDADeviceList& CUDADeviceList::instance()
@@ -117,16 +128,39 @@ std::size_t CUDADeviceList::size() const
     return m_devices.size();
 }
 
-CUDADevice& CUDADeviceList::get_device(const size_t index)
+const CUDADevice& CUDADeviceList::get_device(const size_t index) const
 {
     assert(index < size());
     return m_devices[index];
 }
 
-const CUDADevice& CUDADeviceList::get_device(const size_t index) const
+const CUDADevice& CUDADeviceList::pick_best_device() const
 {
-    assert(index < size());
-    return m_devices[index];
+    assert(size() > 0);
+
+    // for now, we pick device #0.
+    // todo: do something better here...
+    const size_t device_number = 0;
+    const CUDADevice& device = m_devices[device_number];
+
+    // Create a primary context for the device if needed.
+    if (m_contexts[device_number] == nullptr)
+    {
+        const CUdevice dev = static_cast<CUdevice>(device_number);
+        RENDERER_LOG_DEBUG("Creating CUDA primary context for device %d", dev);
+
+        CUcontext ctx;
+        check_cuda_error(cuDevicePrimaryCtxRetain(&ctx, device_number));
+
+        // todo: set context flags here.
+        // cuDevicePrimaryCtxSetFlags(...);
+        // ...
+
+        check_cuda_error(cuCtxPushCurrent(ctx));
+        m_contexts[device_number] = ctx;
+    }
+
+    return device;
 }
 
 }

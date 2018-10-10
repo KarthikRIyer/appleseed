@@ -36,32 +36,36 @@
 #include "cuda.h"
 
 // Standard headers.
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace renderer
 {
 
 class CUDADevice
-  : foundation::NonCopyable
 {
   public:
-    explicit CUDADevice(const int device_number);
+    // Constructor.
+    explicit CUDADevice(const CUdevice device_number);
 
-    ~CUDADevice();
+    // Device properties.
+    CUdevice            m_device_number;
+    std::string         m_name;
+    std::pair<int, int> m_compute_capability;
+    int                 m_compute_mode;
 
-    CUDADevice(CUDADevice&& other);
+    size_t              m_total_mem;
 
-    int device_number() const;
+    int                 m_max_threads_per_block;
+    int                 m_max_block_dim_x;
+    int                 m_max_block_dim_y;
+    int                 m_max_block_dim_z;
+    int                 m_max_grid_dim_x;
+    int                 m_max_grid_dim_y;
+    int                 m_max_grid_dim_z;
 
-    void create_context();
-
-    CUcontext context() const;
-
-    void set_context_current() const;
-
-  private:
-    int         m_device_number;
-    CUcontext   m_context;
+    int                 m_max_registers;
 };
 
 class CUDADeviceList
@@ -70,15 +74,19 @@ class CUDADeviceList
   public:
     static CUDADeviceList& instance();
 
+    ~CUDADeviceList();
+
     bool empty() const;
 
     std::size_t size() const;
 
-    CUDADevice& get_device(const size_t index);
     const CUDADevice& get_device(const size_t index) const;
 
+    const CUDADevice& pick_best_device() const;
+
   private:
-    std::vector<CUDADevice> m_devices;
+    std::vector<CUDADevice>         m_devices;
+    mutable std::vector<CUcontext>  m_contexts;
 
     CUDADeviceList();
 };

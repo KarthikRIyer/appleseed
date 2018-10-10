@@ -26,48 +26,31 @@
 // THE SOFTWARE.
 //
 
-#ifndef APPLESEED_RENDERER_KERNEL_DEVICE_CPURENDERDEVICE_H
-#define APPLESEED_RENDERER_KERNEL_DEVICE_CPURENDERDEVICE_H
-
-// appleseed.renderer headers.
-#include "renderer/kernel/device/renderdevicebase.h"
-
-// Forward declarations.
-namespace foundation { class IAbortSwitch; }
-namespace renderer   { class IFrameRenderer; }
-namespace renderer   { class ITileCallbackFactory; }
-namespace renderer   { class Project; }
-namespace renderer   { class ParamArray; }
-namespace renderer   { class TextureStore; }
+#ifndef APPLESEED_RENDERER_KERNEL_GPU_DEVICEPTR_H
+#define APPLESEED_RENDERER_KERNEL_GPU_DEVICEPTR_H
 
 namespace renderer
 {
 
-class CPURenderDevice
-  : public RenderDeviceBase
+template <typename T>
+class DevicePtr
 {
   public:
-    CPURenderDevice(
-        Project&                    project,
-        const ParamArray&           params,
-        IRendererController*        renderer_controller);
+    explicit DevicePtr(T* ptr = nullptr)
+      : m_ptr(ptr)
+    {
+        m_ptr = ptr;
+    }
 
-    ~CPURenderDevice() override;
+    T* get()
+    {
+        return m_ptr;
+    }
 
-    bool initialize(
-        TextureStore&               texture_store,
-        foundation::IAbortSwitch&   abort_switch) override;
-
-    bool build_or_update_bvh() override;
-
-    IRendererController::Status render_frame(
-        ITileCallbackFactory*       tile_callback_factory,
-        TextureStore&               texture_store,
-        foundation::IAbortSwitch&   abort_switch) override;
-
-    void print_settings() const override;
+  private:
+    T* m_ptr;
 };
 
 }       // namespace renderer
 
-#endif  // !APPLESEED_RENDERER_KERNEL_DEVICE_CPURENDERDEVICE_H
+#endif  // !APPLESEED_RENDERER_KERNEL_GPU_DEVICEPTR_H

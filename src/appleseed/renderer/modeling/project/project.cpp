@@ -336,8 +336,8 @@ void Project::update_optix_trace_context(const int device_number, const char* pt
         impl->m_optix_trace_context.reset(
             new OptixTraceContext(*impl->m_scene, device_number, ptx_dir));
     }
-
-    impl->m_optix_trace_context->update();
+    else
+        impl->m_optix_trace_context->update();
 }
 #endif
 

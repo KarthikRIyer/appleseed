@@ -56,7 +56,7 @@ class IRenderDevice
         foundation::IAbortSwitch&   abort_switch)  = 0;
 
     // Build or update ray tracing acceleration structures.
-    virtual void build_or_update_bvh() = 0;
+    virtual bool build_or_update_bvh() = 0;
 
     virtual IRendererController::Status render_frame(
         ITileCallbackFactory*       tile_callback_factory,

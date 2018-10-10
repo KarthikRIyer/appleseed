@@ -313,7 +313,7 @@ struct MaterialEntry
     void create_optix_nodes(OptixContext& context, const Material& material)
     {
         RENDERER_LOG_DEBUG("      Creating OptiX nodes for material %s", material.get_name());
-        //m_material = context.create_material();
+        m_material = context.create_material();
     }
 
     void update_optix_nodes(OptixContext& context, const Material& material)
@@ -332,20 +332,10 @@ struct MaterialEntry
     void destroy_optix_nodes(OptixContext& context)
     {
         RENDERER_LOG_DEBUG("Destroying OptiX nodes for material");
-        /*
         m_material->destroy();
-
-        if (m_closest_hit)
-            m_closest_hit->destroy();
-
-        if (m_any_hit)
-            m_any_hit->destroy();
-        */
     }
 
     optix::Material m_material;
-    optix::Program  m_closest_hit;
-    optix::Program  m_any_hit;
 
     bool            m_used;
     VersionID       m_version;
@@ -654,8 +644,6 @@ OptixTraceContext::OptixTraceContext(
   , m_scene(scene)
   , m_context(device_number, ptx_dir)
 {
-    assert(context);
-
     update();
 }
 
@@ -691,6 +679,15 @@ void OptixTraceContext::update()
             impl->m_object_instances);
         visit_scene(m_scene, v);
     }
+}
+
+void renderer::OptixTraceContext::trace(
+    const OptixContext::EntryPoint          entry_point,
+    const size_t                            num_rays,
+    DevicePtr<renderer::gpu::Ray>           rays,
+    DevicePtr<renderer::gpu::ShadingPoint>  shading_points)
+{
+    // todo: do OptiX launch here...
 }
 
 }   // namespace renderer

@@ -26,48 +26,77 @@
 // THE SOFTWARE.
 //
 
-#ifndef APPLESEED_RENDERER_KERNEL_DEVICE_CPURENDERDEVICE_H
-#define APPLESEED_RENDERER_KERNEL_DEVICE_CPURENDERDEVICE_H
+#ifndef APPLESEED_RENDERER_KERNEL_GPU_DEVICEBUFFER_H
+#define APPLESEED_RENDERER_KERNEL_GPU_DEVICEBUFFER_H
 
 // appleseed.renderer headers.
-#include "renderer/kernel/device/renderdevicebase.h"
+#include "renderer/kernel/gpu/deviceptr.h"
 
-// Forward declarations.
-namespace foundation { class IAbortSwitch; }
-namespace renderer   { class IFrameRenderer; }
-namespace renderer   { class ITileCallbackFactory; }
-namespace renderer   { class Project; }
-namespace renderer   { class ParamArray; }
-namespace renderer   { class TextureStore; }
+// appleseed.foundation headers.
+#include "foundation/core/concepts/noncopyable.h"
+#include "foundation/core/exceptions/exceptioncudaerror.h"
+
+// CUDA headers.
+#include "cuda.h"
+
+// Standard headers.
+#include <cassert>
 
 namespace renderer
 {
 
-class CPURenderDevice
-  : public RenderDeviceBase
+template <typename T>
+class DeviceBuffer
+  : foundation::NonCopyable
 {
   public:
-    CPURenderDevice(
-        Project&                    project,
-        const ParamArray&           params,
-        IRendererController*        renderer_controller);
+    explicit DeviceBuffer(const size_t size)
+      : m_ptr(0)
+      , m_size(0)
+    {
+        reset(size);
+    }
 
-    ~CPURenderDevice() override;
+    ~DeviceBuffer()
+    {
+        if (m_ptr)
+            cuMemFree(&m_ptr);
+    }
 
-    bool initialize(
-        TextureStore&               texture_store,
-        foundation::IAbortSwitch&   abort_switch) override;
+    void reset(const size_t size = 0)
+    {
+        assert(size != 0);
 
-    bool build_or_update_bvh() override;
+        if (m_ptr)
+            foundation::check_cuda_error(cuMemFree(&m_ptr));
 
-    IRendererController::Status render_frame(
-        ITileCallbackFactory*       tile_callback_factory,
-        TextureStore&               texture_store,
-        foundation::IAbortSwitch&   abort_switch) override;
+        m_ptr = 0;
+        m_size = 0;
 
-    void print_settings() const override;
+        if (m_size != 0)
+        {
+            foundation::check_cuda_error(
+                cuMemAlloc(&m_ptr, size * sizeof(T)));
+
+            m_size = size;
+        }
+    }
+
+    size_t size() const
+    {
+        return m_size;
+    }
+
+    DevicePtr<T> get()
+    {
+        return DevicePtr<T>(reinterpret_cast<T*>(m_ptr));
+    }
+
+  private:
+    CUdeviceptr     m_ptr;
+    const size_t    m_size;
 };
 
 }       // namespace renderer
 
-#endif  // !APPLESEED_RENDERER_KERNEL_DEVICE_CPURENDERDEVICE_H
+#endif  // !APPLESEED_RENDERER_KERNEL_GPU_DEVICEBUFFER_H

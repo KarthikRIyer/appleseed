@@ -50,6 +50,12 @@ struct OptixContext::Impl
 
     const int           m_device_number;
 
+    // OptiX Programs.
+    optix::Program      m_exception_program;
+    optix::Program      m_miss_program;
+    optix::Program      m_closest_hit_program;
+    optix::Program      m_any_hit_program;
+
     explicit Impl(const int device_number, const char* ptx_dir)
       : m_ptx_cache(ptx_dir)
       , m_device_number(device_number)
@@ -74,6 +80,10 @@ struct OptixContext::Impl
                 break;
             }
         }
+
+        // Load OptiX programs.
+        m_exception_program = m_ptx_cache.create_optix_program(
+            m_context, "exception.ptx", "exception");
 
         // Init context vars.
         m_context->setEntryPointCount(1);
@@ -101,6 +111,11 @@ struct OptixContext::Impl
 
     ~Impl()
     {
+        if (m_exception_program)    m_exception_program->destroy();
+        if (m_miss_program)         m_miss_program->destroy();
+        if (m_closest_hit_program)  m_closest_hit_program->destroy();
+        if (m_any_hit_program)      m_any_hit_program->destroy();
+
         m_scene_accel->destroy();
         m_scene->destroy();
         m_context->destroy();
@@ -190,6 +205,11 @@ optix::Handle<optix::VariableObj> OptixContext::operator[](const char* variable_
 void OptixContext::validate()
 {
     impl->m_context->validate();
+}
+
+void OptixContext::launch(EntryPoint entry_point, const size_t size)
+{
+    impl->m_context->launch(entry_point, size);
 }
 
 }   // namespace renderer

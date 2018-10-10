@@ -82,6 +82,16 @@ class OptixContext
 
     void validate();
 
+    // Launch!.
+
+    enum EntryPoint
+    {
+        RaycastEntryPoint = 0,
+        NumEntryPoints
+    };
+
+    void launch(EntryPoint entry_point, const size_t size);
+
   private:
     struct Impl;
     Impl* impl;

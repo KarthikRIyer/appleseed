@@ -62,7 +62,7 @@ bool CPURenderDevice::initialize(
     return true;
 }
 
-void CPURenderDevice::build_or_update_bvh()
+bool CPURenderDevice::build_or_update_bvh()
 {
 #ifdef APPLESEED_WITH_EMBREE
     m_project.set_use_embree(
@@ -70,6 +70,7 @@ void CPURenderDevice::build_or_update_bvh()
 #endif
 
     m_project.update_trace_context();
+    return  true;
 }
 
 IRendererController::Status CPURenderDevice::render_frame(

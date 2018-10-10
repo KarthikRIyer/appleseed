@@ -319,7 +319,7 @@ struct MasterRenderer::Impl
                     new GPURenderDevice(
                         m_project,
                         m_params,
-                        "/hdd/Devel/appleseedhq/appleseedX/sandbox/ptx", // todo: do not hardcode this...
+                        "/hdd/Devel/appleseedhq/appleseedX/sandbox/kernels", // todo: do not hardcode this...
                         m_renderer_controller));
             }
         }
@@ -494,7 +494,8 @@ if (!m_render_device->initialize(texture_store, abort_switch))
             return IRendererController::AbortRendering;
 
 // Build or update ray tracing acceleration structures.
-m_render_device->build_or_update_bvh();
+if (!m_render_device->build_or_update_bvh())
+    return IRendererController::AbortRendering;
 
 #ifdef APPLESEED_WITH_EMBREE
         m_project.set_use_embree(

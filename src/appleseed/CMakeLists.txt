@@ -1024,6 +1024,8 @@ if (WITH_GPU)
     set (renderer_kernel_gpu_sources
         renderer/kernel/gpu/cudadevice.cpp
         renderer/kernel/gpu/cudadevice.h
+        renderer/kernel/gpu/devicebuffer.h
+        renderer/kernel/gpu/deviceptr.h
         renderer/kernel/gpu/optixcontext.cpp
         renderer/kernel/gpu/optixcontext.h
         renderer/kernel/gpu/ptxcache.cpp
@@ -1037,19 +1039,23 @@ if (WITH_GPU)
     )
 
     set (renderer_kernel_gpu_kernels_headers
+        renderer/kernel/gpu/kernels/ray.cuh
+        renderer/kernel/gpu/kernels/shadingpoint.cuh
     )
     set (renderer_kernel_gpu_kernels_sources
         renderer/kernel/gpu/kernels/exception.cu
         renderer/kernel/gpu/kernels/hit.cu
-        renderer/kernel/gpu/kernels/intersect.cu
         renderer/kernel/gpu/kernels/meshobject.cu
-        renderer/kernel/gpu/kernels/miss.cu
+        renderer/kernel/gpu/kernels/raycast.cu
     )
     list (APPEND appleseed_cuda_headers
         ${renderer_kernel_gpu_kernels_headers}
     )
     list (APPEND appleseed_cuda_sources
         ${renderer_kernel_gpu_kernels_sources}
+    )
+    list (APPEND appleseed_sources
+        ${renderer_kernel_gpu_kernels_headers}
     )
     source_group ("renderer\\kernel\\gpu\\kernels" FILES
         ${renderer_kernel_gpu_kernels_headers}
@@ -2204,7 +2210,7 @@ if (WITH_GPU)
                 "-I${CUDA_INCLUDE_DIR} "
                 "-I${OPTIX_INCLUDE_DIR} "
                 "-I${PROJECT_SOURCE_DIR}/src/appleseed "
-                -m64 -arch sm_35 -ptx --std=c++11 -O3 --use_fast_math --expt-relaxed-constexpr
+                -m64 -arch sm_30 -ptx --std=c++11 -O3 --use_fast_math --expt-relaxed-constexpr
                 ${PROJECT_SOURCE_DIR}/src/appleseed/${cuda_source} -o ${ptx_dir}/${ptx_filename}
             MAIN_DEPENDENCY ${PROJECT_SOURCE_DIR}/src/appleseed/${cuda_source}
             DEPENDS ${abs_cuda_headers_sources}

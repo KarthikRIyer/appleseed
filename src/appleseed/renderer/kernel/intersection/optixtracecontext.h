@@ -30,6 +30,9 @@
 #define APPLESEED_RENDERER_KERNEL_INTERSECTION_OPTIXTRACECONTEXT_H
 
 // appleseed.renderer headers.
+#include "renderer/kernel/gpu/deviceptr.h"
+#include "renderer/kernel/gpu/kernels/ray.cuh"
+#include "renderer/kernel/gpu/kernels/shadingpoint.cuh"
 #include "renderer/kernel/gpu/optixcontext.h"
 
 // appleseed.foundation headers.
@@ -72,6 +75,12 @@ class APPLESEED_DLLSYMBOL OptixTraceContext
 
     // Get the OptiX context.
     OptixContext& get_optix_context() const;
+
+    void trace(
+        const OptixContext::EntryPoint  entry_point,
+        const size_t                    num_rays,
+        DevicePtr<gpu::Ray>             rays,
+        DevicePtr<gpu::ShadingPoint>    shading_points);
 
   private:
     struct Impl;
