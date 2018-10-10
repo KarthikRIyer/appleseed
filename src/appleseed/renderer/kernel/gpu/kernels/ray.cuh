@@ -26,17 +26,42 @@
 // THE SOFTWARE.
 //
 
+#ifndef APPLESEED_RENDERER_KERNEL_GPU_KERNELS_RAY_CUH
+#define APPLESEED_RENDERER_KERNEL_GPU_KERNELS_RAY_CUH
+
+// appleseed.renderer headers.
+#include "renderer/modeling/scene/visibilityflags.h"
+
+// appleseed.foundation headers.
+#include "foundation/math/vector.h"
+#include "foundation/platform/compiler.h"
+
 // OptiX headers.
 #include <optix_world.h>
 
-using namespace optix;
-
-//
-//  Miss program.
-//
-
-
-RT_PROGRAM void miss()
+namespace renderer
 {
-    // Do nothing...
-}
+namespace gpu
+{
+
+struct APPLESEED_DEVICE_ALIGN(16) Ray
+{
+    foundation::Vector3f    m_org;
+    float                   m_tmin;
+
+    foundation::Vector3f    m_dir;
+    float                   m_tmax;
+
+    foundation::Vector2f    m_pixel;
+    foundation::uint32      m_ray_flags;
+    float                   m_time;
+};
+
+static_assert(
+    sizeof(Ray) % 16 == 0,
+    "gpu::Ray size is not a multiple of 16");
+
+}       // namespace gpu
+}       // namespace renderer
+
+#endif  // !APPLESEED_RENDERER_KERNEL_GPU_KERNELS_RAY_CUH

@@ -31,13 +31,7 @@
 
 using namespace optix;
 
-
-//
-//  Miss programs.
-//
-
 RT_PROGRAM void exception()
 {
-    // TODO: write me...
+    // todo: implement me...
 }
-

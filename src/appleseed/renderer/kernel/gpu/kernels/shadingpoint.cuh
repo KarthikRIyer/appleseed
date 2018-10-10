@@ -26,47 +26,43 @@
 // THE SOFTWARE.
 //
 
-// appleseed.renderer headers.
-#include "renderer/kernel/gpu/kernels/shadingpoint.cuh"
-#include "renderer/modeling/scene/visibilityflags.h"
+#ifndef APPLESEED_RENDERER_KERNEL_GPU_KERNELS_SHADINGPOINT_CUH
+#define APPLESEED_RENDERER_KERNEL_GPU_KERNELS_SHADINGPOINT_CUH
+
+// appleseed.foundation headers.
+#include "foundation/math/vector.h"
+#include "foundation/platform/compiler.h"
 
 // OptiX headers.
 #include <optix_world.h>
 
-using namespace renderer::gpu;
-using namespace foundation;
-using namespace optix;
-
-//
-// Attributes.
-//
-
-rtDeclareVariable(optix::Ray, ray, rtCurrentRay, );
-
-rtDeclareVariable(ShadingPoint, shading_point_attr, attribute shading_point, );
-
-rtDeclareVariable(ShadingPoint, ray_shading_point, rtPayload, );
-
-
-//
-// Inputs.
-//
-
-//rtDeclareVariable(int, visibility_flags, , );
-
-
-//
-// Hit programs.
-//
-
-RT_PROGRAM void closest_hit()
+namespace renderer
 {
-    // Copy shading_point_attr to ray payload
-    ray_shading_point = shading_point_attr;
-}
-
-RT_PROGRAM void any_hit()
+namespace gpu
 {
-    // if (ray_flags & visibility_flags == 0)
-    //     rtIgnoreIntersection();
-}
+
+struct APPLESEED_DEVICE_ALIGN(16) ShadingPoint
+{
+    enum Flags
+    {
+        Hit = 1 << 0
+    };
+
+    foundation::int32    m_flags;
+    foundation::Vector3f m_point;
+
+    foundation::Vector3f m_geom_normal;
+    float                m_distance;
+
+    foundation::uint32   m_ray_flags;
+    float                pad[3];
+};
+
+static_assert(
+    sizeof(ShadingPoint) % 16 == 0,
+    "gpu::ShadingPoint size is not a multiple of 16");
+
+}       // namespace gpu
+}       // namespace renderer
+
+#endif  // !APPLESEED_RENDERER_KERNEL_GPU_KERNELS_SHADINGPOINT_CUH

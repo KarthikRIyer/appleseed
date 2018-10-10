@@ -28,12 +28,14 @@
 
 // appleseed.renderer headers.
 
-// appleseed.foundation headers.
-#include "foundation/math/ray.h"
+// appleseed.renderer headers.
+#include "renderer/kernel/gpu/kernels/ray.cuh"
+#include "renderer/kernel/gpu/kernels/shadingpoint.cuh"
 
 // OptiX headers.
 #include <optix_world.h>
 
+using namespace renderer;
 using namespace foundation;
 using namespace optix;
 
@@ -53,7 +55,41 @@ rtDeclareVariable(rtObject, scene, , );
 
 
 //
-// Rays.
+// Ray buffer.
 //
 
-rtBuffer<Ray3f, 1>  rays;
+rtBuffer<gpu::Ray, 1> rays;
+
+
+//
+// Outputs.
+//
+
+rtBuffer<gpu::ShadingPoint, 1> shading_points;
+
+
+//
+// Intersection programs.
+//
+
+RT_PROGRAM void raycast()
+{
+    gpu::ShadingPoint ray_shading_point;
+    ray_shading_point.m_flags = 0;
+    // todo: init ray shading point here...
+
+    gpu::Ray ray = rays[launch_index];
+
+    rtTrace(
+        scene,
+        optix::make_Ray(
+            make_float3(ray.m_org.x, ray.m_org.y, ray.m_org.z),
+            make_float3(ray.m_dir.x, ray.m_dir.y, ray.m_dir.z),
+            0, // OptiX ray type.
+            ray.m_tmin,
+            ray.m_tmax),
+            ray_shading_point);
+
+    // Copy ray payload to output buffer.
+    shading_points[launch_index] = ray_shading_point;
+}

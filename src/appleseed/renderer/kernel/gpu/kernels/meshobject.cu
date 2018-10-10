@@ -26,17 +26,15 @@
 // THE SOFTWARE.
 //
 
+// appleseed.renderer headers.
+#include "renderer/kernel/gpu/kernels/shadingpoint.cuh"
+
 // OptiX headers.
 #include <optix_world.h>
 
 using namespace optix;
-
-
-//
-// Shading point variables.
-//
-
-rtDeclareVariable(optix::Ray, ray, rtCurrentRay, );
+using namespace foundation;
+using namespace renderer::gpu;
 
 //
 // Inputs.
@@ -44,6 +42,15 @@ rtDeclareVariable(optix::Ray, ray, rtCurrentRay, );
 
 rtBuffer<float3> vertices;
 rtBuffer<int3>   face_indices;
+
+rtDeclareVariable(optix::Ray, ray, rtCurrentRay, );
+
+
+//
+// Attributes.
+//
+
+rtDeclareVariable(ShadingPoint, shading_point_attr, attribute shading_point, );
 
 
 //
@@ -59,7 +66,6 @@ RT_PROGRAM void intersect(int primitive_index)
     const float3 p2 = vertices[indices.z];
 
     // Intersect ray with triangle.
-    // TODO: check triangle winding order.
     float3 n;
     float t, beta, gamma;
 
@@ -67,7 +73,13 @@ RT_PROGRAM void intersect(int primitive_index)
     {
         if (rtPotentialIntersection(t))
         {
-            //geometric_normal = normalize(n);
+            ShadingPoint shading_point;
+            shading_point.m_flags = 1;
+            shading_point.m_distance = t;
+            //shading_point.geometric_normal = normalize(n);
+            // ...
+
+            shading_point_attr = shading_point;
             rtReportIntersection(0);
         }
     }
