@@ -572,6 +572,7 @@ namespace
         writer.set_image_output_format(PixelFormat::PixelFormatUInt8);
 
         image_attributes.insert("color_space", "sRGB");
+        image_attributes.insert("oiio:dither", "1");
         writer.set_image_attributes(image_attributes);
 
         writer.write();
